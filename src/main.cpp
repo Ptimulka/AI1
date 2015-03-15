@@ -1,6 +1,7 @@
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+
 #include <iostream>
 #include <vector>
 
@@ -8,16 +9,13 @@ using namespace cv;
 using namespace std;
 
 
-
-
-
 Mat *detectEdges(String name, bool color) {
 
 	Mat mat;
 	if (!color)
-		mat = imread(name, CV_LOAD_IMAGE_GRAYSCALE);
+		mat = imread(name, IMREAD_GRAYSCALE);
 	else
-		mat = imread(name, CV_LOAD_IMAGE_COLOR);
+		mat = imread(name, IMREAD_COLOR);
 
 	if (mat.data == NULL)
 		return NULL;	//not found
@@ -41,11 +39,11 @@ Mat *detectEdges(String name, bool color) {
 
 void compareImages() {
 
-	Mat im_gray0 = imread("zdj0.jpg", CV_LOAD_IMAGE_GRAYSCALE);
-	Mat im_color0 = imread("zdj0.jpg", CV_LOAD_IMAGE_COLOR);
+	Mat im_gray0 = imread("zdj0.jpg", IMREAD_GRAYSCALE);
+	Mat im_color0 = imread("zdj0.jpg", IMREAD_COLOR);
 
-	Mat im_gray = imread("zdj000013.jpg", CV_LOAD_IMAGE_GRAYSCALE);
-	Mat im_color = imread("zdj000013.jpg", CV_LOAD_IMAGE_COLOR);
+	Mat im_gray = imread("zdj000013.jpg", IMREAD_GRAYSCALE);
+	Mat im_color = imread("zdj000013.jpg", IMREAD_COLOR);
 
 	blur(im_gray0, im_gray0, Size(5, 5));
 	blur(im_gray, im_gray, Size(5, 5));
@@ -72,11 +70,11 @@ void compareAndEdges() {
 
 	
 
-	Mat im_gray0 = imread("zdj0.jpg", CV_LOAD_IMAGE_GRAYSCALE);
-	Mat im_color0 = imread("zdj0.jpg", CV_LOAD_IMAGE_COLOR);
+	Mat im_gray0 = imread("zdj0.jpg", IMREAD_GRAYSCALE);
+	Mat im_color0 = imread("zdj0.jpg", IMREAD_COLOR);
 
-	Mat im_gray = imread("zdj000013.jpg", CV_LOAD_IMAGE_GRAYSCALE);
-	Mat im_color = imread("zdj000013.jpg", CV_LOAD_IMAGE_COLOR);
+	Mat im_gray = imread("zdj000013.jpg", IMREAD_GRAYSCALE);
+	Mat im_color = imread("zdj000013.jpg", IMREAD_COLOR);
 
 	blur(im_gray0, im_gray0, Size(5, 5));
 	blur(im_gray, im_gray, Size(5, 5));
@@ -133,9 +131,9 @@ Mat *imagesDifference(Mat mat1, String im2, bool color) {
 	Mat *diff = new Mat();
 
 	if (color) 
-		mat2 = imread(im2, CV_LOAD_IMAGE_COLOR);
+		mat2 = imread(im2, IMREAD_COLOR);
 	else 
-		mat2 = imread(im2, CV_LOAD_IMAGE_GRAYSCALE);
+		mat2 = imread(im2, IMREAD_GRAYSCALE);
 
 
 	if (mat2.data == NULL)
@@ -152,12 +150,12 @@ Mat *imagesDifference(String im1, String im2, bool color) {
 	Mat mat2;
 
 	if (color) {
-		mat1 = imread(im1, CV_LOAD_IMAGE_COLOR);
-		mat2 = imread(im2, CV_LOAD_IMAGE_COLOR);
+		mat1 = imread(im1, IMREAD_COLOR);
+		mat2 = imread(im2, IMREAD_COLOR);
 	}
 	else {
-		mat1 = imread(im1, CV_LOAD_IMAGE_GRAYSCALE);
-		mat2 = imread(im2, CV_LOAD_IMAGE_GRAYSCALE);
+		mat1 = imread(im1, IMREAD_GRAYSCALE);
+		mat2 = imread(im2, IMREAD_GRAYSCALE);
 	}
 
 	if (mat1.data == NULL || mat2.data == NULL)
@@ -177,9 +175,9 @@ Mat *averageImage(std::vector<String> &imageNames, bool color) {
 	for (int i = 0; i < imageNames.size(); i++) {
 		Mat next;
 		if (color)
-			next = imread(imageNames.at(i), CV_LOAD_IMAGE_COLOR);
+			next = imread(imageNames.at(i), IMREAD_COLOR);
 		else
-			next = imread(imageNames.at(i), CV_LOAD_IMAGE_GRAYSCALE);
+			next = imread(imageNames.at(i), IMREAD_GRAYSCALE);
 		if (next.data == NULL)
 			return NULL;	//image not found
 		images.push_back(next);
@@ -244,10 +242,10 @@ int main(int argc, char** argv)
 	imshow("window5", *detectedEdges); // Show our image inside it.
 	*/
 
-	Mat hist = imread("cctv45009.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+	Mat hist = imread("cctv45009.jpg", IMREAD_GRAYSCALE);
 	equalizeHist(hist, hist);
 
-	Mat hist2 = imread("cctv00000.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+	Mat hist2 = imread("cctv00000.jpg", IMREAD_GRAYSCALE);
 	equalizeHist(hist2, hist2);
 
 	Mat *diff = imagesDifference("cctv00000.jpg", "cctv45009.jpg", false);
