@@ -145,6 +145,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\utils\cmdline.cpp" />
+    <ClCompile Include="src\utils\log.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\utils\cmdline.h" />
+    <ClInclude Include="src\utils\log.h" />
+    <ClInclude Include="src\utils\nlqueue.h" />
+    <ClInclude Include="src\utils\singleton.h" />
+    <ClInclude Include="src\utils\stringlist.h" />
+    <ClInclude Include="src\utils\strutils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
