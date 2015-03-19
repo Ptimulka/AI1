@@ -30,6 +30,9 @@
     <ClCompile Include="src\utils\log.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\ImageOperations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\utils\cmdline.h">
@@ -49,6 +52,9 @@
     </ClInclude>
     <ClInclude Include="src\utils\strutils.h">
       <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ImageOperations.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

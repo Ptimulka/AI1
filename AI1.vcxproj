@@ -144,11 +144,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ImageOperations.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\utils\cmdline.cpp" />
     <ClCompile Include="src\utils\log.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ImageOperations.h" />
     <ClInclude Include="src\utils\cmdline.h" />
     <ClInclude Include="src\utils\log.h" />
     <ClInclude Include="src\utils\nlqueue.h" />
