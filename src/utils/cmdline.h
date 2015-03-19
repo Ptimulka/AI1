@@ -59,7 +59,7 @@ public:
     CmdLine();
     ~CmdLine();
 
-    void parse(const char* args[], unsigned int count);
+    void parse(char** args, unsigned int count);
     void parse(std::string args);
     void parse(StringList args);
 

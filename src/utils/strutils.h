@@ -9,6 +9,12 @@
 
 #pragma warning(disable: 4996)
 
+template <typename FROM, typename TO>
+inline TO convert(FROM const& str)
+{
+    return TO().assign(str.begin(), str.end());
+}
+
 namespace
 {
     template <typename T>
@@ -29,6 +35,12 @@ namespace
         }
         out << "]";
         return out;
+    }
+
+    template<>
+    std::ostream& _push(std::ostream& out, std::wstring const& str)
+    {
+        return _push(out, convert<std::wstring, std::string>(str));
     }
 
     template <>

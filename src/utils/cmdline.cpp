@@ -10,7 +10,7 @@ CmdLine::~CmdLine()
 
 }
 
-void CmdLine::parse(const char* args[], unsigned int count)
+void CmdLine::parse(char** args, unsigned int count)
 {
     StringList ret;
     for (decltype(count) i = 0; i < count; ++i)

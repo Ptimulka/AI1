@@ -16,7 +16,7 @@ ImageOperations::ImageOperations(std::string referenceImagePath, std::vector<std
 		return;
 	}
 
-	for (int i = 0; i < paths.size(); i++) {
+	for (decltype(paths.size()) i = 0; i < paths.size(); i++) {
 		Mat next = imread(paths.at(i), IMREAD_COLOR);
 		if (next.data == NULL) {
 			vectorOfImagesLoaded = false;
@@ -70,7 +70,7 @@ bool  ImageOperations::loadVectorOfImages(std::vector<std::string> paths) {
 	std::vector<Mat> loadedImages;
 	std::vector<Mat> loadedImagesGrayscale;
 
-	for (int i = 0; i < paths.size(); i++) {
+	for (decltype(paths.size()) i = 0; i < paths.size(); i++) {
 		Mat next = imread(paths.at(i), IMREAD_COLOR);
 		if (next.data == NULL) {
 			loadedImages.clear();
@@ -136,13 +136,12 @@ Mat ImageOperations::getRecentOperationOnReferenceImage(bool inColor) {
 	return recentOperationGrayscale;
 }
 
-
 bool ImageOperations::imagesDifference() {
 
 	if (!areImagesLoaded())
 		return false;
 
-	for (int i = 0; i < recentOperationOnVector.size(); i++) {
+	for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
 		absdiff(recentOperationOnVector.at(i), referenceImage, recentOperationOnVector.at(i));
 		absdiff(recentOperationOnVectorGrayscale.at(i), referenceImageGrayscale, recentOperationOnVectorGrayscale.at(i));
 	}
@@ -158,7 +157,7 @@ bool ImageOperations::detectEdges(makeOperationOn makeOn) {
 
 	if (makeOn == ALL || makeOn == VECTOR_OF_IMAGES) {
 
-		for (int i = 0; i < recentOperationOnVector.size(); i++) {
+        for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
 			Canny(recentOperationOnVector.at(i), recentOperationOnVector.at(i), 10, 30, 3);
 			Canny(recentOperationOnVectorGrayscale.at(i), recentOperationOnVectorGrayscale.at(i), 10, 30, 3);
 		}
@@ -179,7 +178,7 @@ bool ImageOperations::blurImages(makeOperationOn makeOn, int size) {
 
 	if (makeOn == ALL || makeOn == VECTOR_OF_IMAGES) {
 
-		for (int i = 0; i < recentOperationOnVector.size(); i++) {
+        for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
 			blur(recentOperationOnVector.at(i), recentOperationOnVector.at(i), Size(size, size));
 			blur(recentOperationOnVectorGrayscale.at(i), recentOperationOnVectorGrayscale.at(i), Size(size, size));
 		}
@@ -200,7 +199,7 @@ bool ImageOperations::medianFiltr(makeOperationOn makeOn, int size) {
 
 	if (makeOn == ALL || makeOn == VECTOR_OF_IMAGES) {
 
-		for (int i = 0; i < recentOperationOnVector.size(); i++) {
+        for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
 			medianBlur(recentOperationOnVector.at(i), recentOperationOnVector.at(i), size);
 			medianBlur(recentOperationOnVectorGrayscale.at(i), recentOperationOnVectorGrayscale.at(i), size);
 		}
