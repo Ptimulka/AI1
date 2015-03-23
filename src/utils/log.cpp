@@ -2,7 +2,7 @@
 #include <thread>
 using namespace std;
 
-Log::Log() : init(false), run(), worker([this]{ while (this->run || !init){ if (init) this->_flush(); std::this_thread::sleep_for(std::chrono::seconds(1)); }}), msgs()
+Log::Log() : init(false), run(), worker([this]{ while (this->run || !init){ std::this_thread::sleep_for(std::chrono::seconds(1)); if (init) this->_flush(); }}), msgs()
 {
     atomic_init(&run, true);
     init = true;

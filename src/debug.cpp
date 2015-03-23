@@ -7,6 +7,12 @@
 #include <iostream>
 using namespace std;
 
+//ta funkcja to taki ma?y hack,
+//pozwala na wykrycie, czy program zosta? uruchomiony przy u?yciu debuggera i je?li tak,
+//to pozwala na nadpisanie argumentów wywo?ania programu (chodzi o to, ze je?li debuggujemy, to argumenty trzeba
+// zmieniac za kazdym razem w opcjach projektu - komu by sie chcialo?)
+//  dzia?anie jest dosy? toporne: wczytujemy lini? tekstu - je?li jest pusta, to nic nie robimy (zostawiamy jak jest)
+//  je?li nie to rozbijamy j? na wyrazy (szukamy spacji) i zapisujemy pó?niej wszystko we wskazanej tablicy (argv)
 void OverrideArgumentInDebuggin(int& argc, char**& argv)
 {
     if (!IsDebuggerPresent())
