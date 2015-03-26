@@ -73,6 +73,15 @@ namespace
         }
     };
 
+    template <>
+    struct _Writer < std::wstring >
+    {
+        static inline std::ostream& push(std::ostream& out, std::wstring const& str)
+        {
+            return out << convert<std::wstring, std::string>(str);
+        }
+    };
+
     //wywolujemy _Write<T>::push dla t
     template <typename T>
     inline void _makestr(std::ostream& out, T const& t)
@@ -132,7 +141,7 @@ namespace
     //analogicznie jak przy formatowaniu (tylko prosciej ;d)
     // parsujemy zmienne = domyslnie uzywamy stringstream
     template <typename T>
-    struct _Parser
+    struct _Evaluator
     {
         static inline T evaluate(std::string const& str) 
         {
@@ -147,7 +156,7 @@ namespace
 
     //wyspecjalizowana wersja dla bool (stringstream nie zamieni np. "yes" na true)
     template <>
-    struct _Parser<bool>
+    struct _Evaluator<bool>
     {
         static inline bool evaluate(std::string const& str)
         {
@@ -166,14 +175,14 @@ namespace
     //    dostajemy. zamiast sprawdzac za kazdym razem, kiedy parsujemy zmienna nieznanego typu
     //    czy przypadkiem jest stringiem, latwiej uwzglednic to tutaj i sie nie martwic gdzie indziej. :)
     template <>
-    struct _Parser<std::string>
+    struct _Evaluator<std::string>
     {
         static inline std::string evaluate(std::string const& str) { return str; }
     };
 
     //dla wstringa konwertujemy
     template <>
-    struct _Parser<std::wstring>
+    struct _Evaluator<std::wstring>
     {
         static inline std::wstring evaluate(std::string const& str) { return convert<std::string, std::wstring>(str); }
     };
@@ -184,7 +193,7 @@ namespace
 template <typename T>
 inline T parse(std::string const& str)
 {
-    return _Parser<T>::evaluate(str);
+    return _Evaluator<T>::evaluate(str);
 }
 
 //jak wyzej tylko z try-catchem itd, zwraca, czy sie powiodlo, cel zapisuje przekazywany jako referencja
