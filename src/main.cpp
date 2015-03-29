@@ -119,9 +119,11 @@ int main(int argc, char** argv)
 
         vector<Mat> mats = op.getRecentOperationOnVector(false);
 
+		string windowName = "window";
+
         for (decltype(mats.size()) i = 0; i < mats.size(); i++) {
-            namedWindow("window" + i, WINDOW_AUTOSIZE);
-            imshow("window" + i, mats.at(i));
+			namedWindow(windowName + std::to_string(i), WINDOW_AUTOSIZE);
+			imshow(windowName + std::to_string(i), mats.at(i));
         }
 
         waitKey(); //without this image won't be shown
