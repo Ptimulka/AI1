@@ -211,3 +211,23 @@ bool ImageOperations::medianFiltr(makeOperationOn makeOn, int size) {
 	}
 	return true;
 }
+
+
+bool ImageOperations::threshold(makeOperationOn makeOn) {
+
+	if (!isWhatShouldBeLoaded(makeOn))
+		return false;
+
+	if (makeOn == ALL || makeOn == VECTOR_OF_IMAGES) {
+
+		for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
+			cv::threshold(recentOperationOnVectorGrayscale.at(i), recentOperationOnVectorGrayscale.at(i), 50, 255, THRESH_BINARY);	//255 = bia³y
+		}
+	}
+
+	if (makeOn == ALL || makeOn == REFERNCE_IMAGE) {
+		cv::threshold(recentOperation, recentOperation, 50, 200, THRESH_BINARY);
+	}
+	return true;
+
+}

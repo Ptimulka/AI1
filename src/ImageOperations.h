@@ -73,12 +73,14 @@ public:
 
 	//liczy ró¿nice miêdzy obrazkiem referencyjnym a pozosta³ymi
 	bool imagesDifference();
-	//wykrywa krawêdzie
+	//wykrywa krawêdzie, jeszcze dobrze nie dziala!!!
 	bool detectEdges(makeOperationOn makeOn = ALL);
 	//rozmazanko
 	bool blurImages(makeOperationOn makeOn = ALL, int size = 5);
-	//filtr medianowy - nie rozmazuje krawêdzi!
+	//filtr medianowy - nie rozmazuje krawêdzi! Uwaga!!! Musi byæ NIEPARZYSTY SIZE!!!
 	bool medianFiltr(makeOperationOn makeOn = ALL, int size = 5);
+	//zawsze zapominam jak to s³ówko sie t³umaczy na polski - operacaja wykonywana tylko na 1-channelowym czyli np grayscale, na razie nie ma tych œmiechowych argumentów
+	bool threshold(makeOperationOn makeOn = ALL);
 
 
 

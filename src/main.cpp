@@ -114,8 +114,9 @@ int main(int argc, char** argv)
         op.loadVectorOfImages(imageNames);
 
         //z ktorymi cos potem robimy (to juz nie moje ;d)
-        op.medianFiltr();
+        op.medianFiltr(op.ALL, 11);
         op.imagesDifference();
+		op.threshold(op.VECTOR_OF_IMAGES);
 
         vector<Mat> mats = op.getRecentOperationOnVector(false);
 
