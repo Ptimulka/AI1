@@ -136,14 +136,87 @@ Mat ImageOperations::getRecentOperationOnReferenceImage(bool inColor) {
 	return recentOperationGrayscale;
 }
 
-bool ImageOperations::imagesDifference() {
 
-	if (!areImagesLoaded())
+bool ImageOperations::imagesDifference(bool useUserReferenceImage, bool doItWiselyButLong) {
+
+	if ((useUserReferenceImage && !areImagesLoaded()) || (!useUserReferenceImage && !isVectorOfImagesLoaded()))
 		return false;
 
-	for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
-		absdiff(recentOperationOnVector.at(i), referenceImage, recentOperationOnVector.at(i));
-		absdiff(recentOperationOnVectorGrayscale.at(i), referenceImageGrayscale, recentOperationOnVectorGrayscale.at(i));
+	decltype(recentOperationOnVector.size()) sizeOfVector = recentOperationOnVector.size();
+
+
+	if (useUserReferenceImage) {
+
+		for (decltype(sizeOfVector) i = 0; i < sizeOfVector; i++) {
+			absdiff(recentOperationOnVector.at(i), referenceImage, recentOperationOnVector.at(i));
+			absdiff(recentOperationOnVectorGrayscale.at(i), referenceImageGrayscale, recentOperationOnVectorGrayscale.at(i));
+		}
+	}
+	else {
+
+
+		Mat mean = Mat::zeros(recentOperationOnVector.at(0).rows, recentOperationOnVector.at(0).cols, CV_32FC3);
+		Mat meanGrayscale = Mat::zeros(recentOperationOnVector.at(0).rows, recentOperationOnVector.at(0).cols, CV_32FC1);
+		Mat convertedToFloat;
+
+		for (decltype(sizeOfVector) i = 0; i < sizeOfVector; i++) {
+			recentOperationOnVector.at(i).convertTo(convertedToFloat, CV_32FC3);	//
+			accumulate(convertedToFloat, mean);
+			recentOperationOnVectorGrayscale.at(i).convertTo(convertedToFloat, CV_32FC1);
+			accumulate(convertedToFloat, meanGrayscale);
+		}
+
+
+		mean = mean / sizeOfVector;
+		mean.convertTo(mean, CV_8U);
+
+		meanGrayscale = meanGrayscale / sizeOfVector;
+		meanGrayscale.convertTo(meanGrayscale, CV_8U);
+
+		Mat meanGrayscale2(meanGrayscale.rows, meanGrayscale.cols, CV_8U);
+		
+		if (doItWiselyButLong) {
+
+			for (int y = 0; y < meanGrayscale.rows; y++) {
+				for (int x = 0; x < meanGrayscale.cols; x++) {
+
+					float standardDeviation = 0;
+					float average = (float)(meanGrayscale.at<unsigned char>(cv::Point(x, y)));
+
+					for (decltype(sizeOfVector) i = 0; i < sizeOfVector; i++)
+						standardDeviation += abs((float)(recentOperationOnVectorGrayscale.at(i).at<unsigned char>(cv::Point(x, y))) - average);
+					
+					standardDeviation /= sizeOfVector;
+
+					int notSuspected = sizeOfVector;
+					
+					float averageChanged = average;
+					for (decltype(sizeOfVector) i = 0; i < sizeOfVector; i++) {
+
+						if (abs((float)(recentOperationOnVectorGrayscale.at(i).at<unsigned char>(cv::Point(x, y))) - average) > standardDeviation) {
+							averageChanged = averageChanged - ((float)(recentOperationOnVectorGrayscale.at(i).at<unsigned char>(cv::Point(x, y)))) / notSuspected;
+							averageChanged *= ((float)notSuspected); 
+							notSuspected--;
+							//raczej nie bêdzie asserta, bo to niemo¿liwe, ¿e wszystkie bêdê mia³y odchylenie wiêksze ni¿ standardowe
+							assert(notSuspected != 0);
+							averageChanged /= ((float)notSuspected);
+						}
+					
+					}
+
+					meanGrayscale.at<unsigned char>(cv::Point(x, y)) = (unsigned char)averageChanged;
+					}
+			}
+
+		}
+
+
+		for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
+
+			absdiff(recentOperationOnVector.at(i), mean, recentOperationOnVector.at(i));
+			absdiff(recentOperationOnVectorGrayscale.at(i), meanGrayscale, recentOperationOnVectorGrayscale.at(i));
+		}
+
 	}
 
 	return true;
@@ -213,7 +286,7 @@ bool ImageOperations::medianFiltr(makeOperationOn makeOn, int size) {
 }
 
 
-bool ImageOperations::threshold(makeOperationOn makeOn) {
+bool ImageOperations::threshold(int thresh, makeOperationOn makeOn) {
 
 	if (!isWhatShouldBeLoaded(makeOn))
 		return false;
@@ -221,7 +294,7 @@ bool ImageOperations::threshold(makeOperationOn makeOn) {
 	if (makeOn == ALL || makeOn == VECTOR_OF_IMAGES) {
 
 		for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
-			cv::threshold(recentOperationOnVectorGrayscale.at(i), recentOperationOnVectorGrayscale.at(i), 50, 255, THRESH_BINARY);	//255 = bia³y
+			cv::threshold(recentOperationOnVectorGrayscale.at(i), recentOperationOnVectorGrayscale.at(i), thresh, 255, THRESH_BINARY);	//255 = bia³y
 		}
 	}
 

@@ -4,8 +4,11 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/video/background_segm.hpp"
+#include "opencv2/opencv.hpp"
 
 #include <vector>
+#include <assert.h>
 
 using namespace cv;
 
@@ -28,6 +31,7 @@ private:
 
 	bool referenceImageLoaded;
 	bool vectorOfImagesLoaded;
+
 
 public:
 	enum makeOperationOn {
@@ -71,17 +75,18 @@ public:
 
 	//poni¿sze funkcje wykonuj¹ operacje na ca³ym wektorku za³adowanych obrazów
 
-	//liczy ró¿nice miêdzy obrazkiem referencyjnym a pozosta³ymi
-	bool imagesDifference();
+	//liczy ró¿nice miêdzy obrazkiem referencyjnym a pozosta³ymi, lub tworzy obrazek œredni i go traktuje jako referencyjny, drugi parametr dotyczy w³aœnie tego
+	//tzn czy chcemy skorzystaæ z wyrzucania pikselków bardzo odchylonych od œredniej
+	bool imagesDifference(bool useUserReferenceImage = true, bool doItWiselyButLong = true);
 	//wykrywa krawêdzie, jeszcze dobrze nie dziala!!!
-	bool detectEdges(makeOperationOn makeOn = ALL);
+	bool detectEdges(makeOperationOn makeOn = VECTOR_OF_IMAGES);
 	//rozmazanko
 	bool blurImages(makeOperationOn makeOn = ALL, int size = 5);
 	//filtr medianowy - nie rozmazuje krawêdzi! Uwaga!!! Musi byæ NIEPARZYSTY SIZE!!!
 	bool medianFiltr(makeOperationOn makeOn = ALL, int size = 5);
-	//zawsze zapominam jak to s³ówko sie t³umaczy na polski - operacaja wykonywana tylko na 1-channelowym czyli np grayscale, na razie nie ma tych œmiechowych argumentów
-	bool threshold(makeOperationOn makeOn = ALL);
-
+	//zawsze zapominam jak to s³ówko sie t³umaczy na polski - operacaja wykonywana tylko na 1-channelowym czyli np grayscale
+	//thresh  - minimum ¿eby zostaæ bia³ym pikselem
+	bool threshold(int thresh = 50, makeOperationOn makeOn = VECTOR_OF_IMAGES);
 
 
 };
