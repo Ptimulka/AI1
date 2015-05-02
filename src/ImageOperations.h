@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <assert.h>
+#include <limits>
 
 using namespace cv;
 
@@ -21,6 +22,7 @@ private:
 	Mat recentOperationGrayscale;
 	std::vector<Mat> savedOperationsOnReferenceImage;
 	std::vector<Mat> savedOperationsOnReferenceImageGrayscale;
+	Mat meanImage;
 
 	std::vector<Mat> loadedImages;
 	std::vector<Mat> loadedImagesGrayscale;
@@ -42,6 +44,7 @@ public:
 
 private:
 	bool isWhatShouldBeLoaded(makeOperationOn makeOn);
+	bool isContourOk(std::vector<Point> contour, int sizeMin = 10);
 
 
 public:
@@ -88,6 +91,10 @@ public:
 	//thresh  - minimum ¿eby zostaæ bia³ym pikselem
 	bool threshold(int thresh = 50, makeOperationOn makeOn = VECTOR_OF_IMAGES);
 
+
+	//funkcja obczajaj¹ca kontury
+	Mat markCars(int whichImage, unsigned char red = 255, unsigned char green = 0, unsigned char blue = 0);
+	std::vector<Mat> markCars(unsigned char red = 255, unsigned char green = 0, unsigned char blue = 0);
 
 };
 
