@@ -9,6 +9,7 @@
 #include "utils/cmdline.h"
 #include "utils/strutils.h"
 #include "io/dir.h"
+#include "ann/cl/oclkernel.h"
 
 using namespace cv;
 using namespace std;
@@ -58,6 +59,13 @@ int main(int argc, char** argv)
         sLog.log("Could not open file ", Opts::log_file, " for logging - log output will only be pushed to console.");
     else //jesli nie, to dodajemy dodatkowe wyj?cie loga do pliku
         sLog.addOutput(&out);
+
+    if (Opts::ocl_try_compile.isSet())
+    {
+        OclKernel _tmp(Opts::ocl_try_compile);
+        sLog.close();
+        return 0;
+    }
 
     //s?ów kilka a propos ?adowania obrazków,
     // obrazki dzielimy na grupy/paczki/itd. idea jest taka, zeby kazda taka paczka
@@ -141,7 +149,7 @@ int main(int argc, char** argv)
 
     //po sprawdzeniu wszystkich grup zamykamy log (jest to wymagane, bo Log wypisuje informacje asynchronicznie co 1s, wiec
     //musimy mu dac czas, aby sprawdzil, czy cos jeszcze nie zostalo do wypisania itd.)
-    //  w praktyce - Log::close ustawia flage run na false po czym wywoluje funkcje thread::join na watku
+    //  w praktyce - Log::close ustawia flage run na false po czym nwywoluje funkcje thread::join na watku
     //  odpowiedzialnym za wypisywanie informacji. Watek ten co 1s sie budzi i sprawdza, czy run==true i wypisuje
     //  zawartosc kolejki powiazanej z logiem i znowu zasypia. jesli run==false, konczy prace.
     sLog.close();

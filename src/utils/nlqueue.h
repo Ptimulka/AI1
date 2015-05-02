@@ -32,7 +32,7 @@ public:
 
     inline void push(T&& t)
     {
-        _push(new Node(t));
+        _push(new Node(std::move(t)));
     }
 
     inline T pop()
@@ -67,7 +67,7 @@ private:
     struct Node
     {
         inline Node(T const& t) : value(new T(t)) { }
-        inline Node(T&& t) : value(new T(t)) { }
+        inline Node(T&& t) : value(new T(std::move(t))) { }
 
         inline Node() = default;
         inline Node(Node const& n) = delete;

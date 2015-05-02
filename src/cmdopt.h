@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "utils/optional.h"
 
 namespace Opts
 {
@@ -13,5 +14,6 @@ namespace Opts
     extern std::string imgs_groups_regexp; //="default"
     extern std::string log_file; //="AI.log"
     extern bool log_file_append; //=false
+    extern optional<std::string> ocl_try_compile;
 }
 

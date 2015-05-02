@@ -6,9 +6,10 @@ class Singleton
 {
 public:
 
-    static C& singleton()
+	template <typename... ARGS>
+    static C& singleton(ARGS const&... ctor_args)
     {
-        static C _me = C();
+        static C _me(ctor_args...);
         return _me;
     }
 };

@@ -54,8 +54,8 @@ void CmdLine::parse(StringList args)
                 throw logic_error("Invalid option '-' found on cmd line!");
 
             arg = arg.substr(1);
-            auto itr = find_if(opts.begin(), opts.end(), [&arg](CmdOpt* el) -> bool { return find(el->names.begin(), el->names.end(), arg) != el->names.end(); });
-            if (itr == opts.end())
+            auto itr2 = find_if(opts.begin(), opts.end(), [&arg](CmdOpt* el) -> bool { return find(el->names.begin(), el->names.end(), arg) != el->names.end(); });
+            if (itr2 == opts.end())
                 throw logic_error("Unknown option '" + arg + "' found on cmd line!");
             if (curr_opt)
             {
@@ -64,7 +64,7 @@ void CmdLine::parse(StringList args)
 
                 _handle(curr_opt, opt_args_list);
             }
-            curr_opt = *itr;
+            curr_opt = *itr2;
             curr_opt_name = arg;
             opt_args_list.clear();
         }
@@ -109,30 +109,18 @@ void CmdLine::_preParse(StringList& list)
         auto& item = *itr;
         if (string_parse)
         {
-            bool escape = false;
-            for (decltype(item.size()) i = 0; i < item.size(); ++i)
+            auto str_end = item.find('"');
+            tmp += item.substr(0, str_end);
+            string_parse = (str_end == itr->npos);
+            if (string_parse)
             {
-                char& c = item[i];
-                if (escape)
-                {
-                    tmp += c;
-                    escape = false;
-                }
-                else if (c == '\\')
-                    escape = true;
-                else if (c == '"')
-                {
-                    string_parse = false;
-                    item = item.substr(i);
-                    itr = --list.insert(++itr, item); //insert remaining string to args and make itr point before it (so in the next loop it will point to newly inserted item)
-                    item = std::move(tmp);
-                    tmp.clear();
-                    break;
-                }
+                tmp.append(" ");
+                itr = --list.erase(itr);
             }
+            else
+                item = tmp;
 
-            if (string_parse) //after processing arg if we didn't found end of string skip later processing
-                continue;
+            continue;
         }
 
         auto break_pos = item.find('=');
@@ -142,15 +130,15 @@ void CmdLine::_preParse(StringList& list)
 
         if (str_begin == item.npos || break_pos < str_begin)
         {
-            list.insert(itr, item.substr(0, break_pos - 1));
-            item = item.substr(break_pos);
+            itr = list.insert(itr, item.substr(0, break_pos));
+            item = item.substr(break_pos+1);
             continue;
         }
 
         if (break_pos == item.npos || str_begin < break_pos)
         {
-            itr = list.insert(itr, item.substr(0, str_begin - 1));
-            item = item.substr(str_begin);
+            itr = list.insert(itr, item.substr(0, str_begin));
+            item = item.substr(str_begin+1);
             string_parse = true;
             continue;
         }

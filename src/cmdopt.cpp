@@ -10,6 +10,7 @@ namespace Opts
     std::string imgs_groups_regexp = "default"; //interesujaca nas grupa/grupy (patrz main.cpp)
     std::string log_file = "AI.log"; //nazwa logu (patrz main.cpp)
     bool log_file_append = false; //czy dopisujemy (patrz main.cpp)
+    optional<std::string> ocl_try_compile;
 }
 
 
@@ -57,4 +58,10 @@ namespace
         "Default: false",
         0, 1,
         CMDLINE_ASSIGMENT_HANDLER(Opts::log_file_append));
+
+    static CmdOpt ocl_try_compile(
+        StringList({ "ocl-try-compile", "ocl-compile", "compile" }),
+        "",
+        0, 1,
+        CMDLINE_ASSIGMENT_HANDLER(Opts::ocl_try_compile));
 }

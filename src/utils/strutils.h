@@ -10,6 +10,7 @@
 #include <ctime>
 #include <chrono>
 #include <vector>
+#include "optional.h"
 
 #pragma warning(disable: 4996)
 
@@ -40,7 +41,7 @@ namespace
     template <typename T>
     struct _Writer<std::vector<T>>
     {
-        static inline std::ostream& push(std::ostream& out, std::vector<T> const& t)
+        static inline std::ostream& push(std::ostream& out, std::vector<T> const& ts)
         {
             out << "[";
             for (decltype(ts.size()) i = 0; i < ts.size(); ++i)
@@ -73,8 +74,20 @@ namespace
         }
     };
 
+    template <typename T>
+    struct _Writer <optional<T>>
+    {
+        static inline std::ostream& push(std::ostream& out, optional<T> const& opt)
+        {
+            if (!opt.isSet())
+                return out << "(no set)";
+            else
+                return _Writer<T>::push(out, *opt.raw());
+        }
+    };
+
     template <>
-    struct _Writer < std::wstring >
+    struct _Writer <std::wstring>
     {
         static inline std::ostream& push(std::ostream& out, std::wstring const& str)
         {
@@ -185,6 +198,12 @@ namespace
     struct _Evaluator<std::wstring>
     {
         static inline std::wstring evaluate(std::string const& str) { return convert<std::string, std::wstring>(str); }
+    };
+
+    template <typename T>
+    struct _Evaluator<optional<T>>
+    {
+        static inline optional<T> evaluate(std::string const& str) { return optional<T>(_Evaluator<T>::evaluate(str)); }
     };
 }
 
