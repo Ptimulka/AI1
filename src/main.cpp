@@ -128,13 +128,12 @@ int main(int argc, char** argv)
 		//op.imagesDifference();
 		
 		//lub opcja2, kiedy nie mamy obrazka referencyjnego, false - nie mamy ref, true - chcemy u¿yæ algorytmu z odchyleniem standardowym
-		op.imagesDifference(false, true);
+		op.imagesDifference(false, true);			
 
 
+		op.threshold(20, op.VECTOR_OF_IMAGES);
 
-		//op.threshold(30, op.VECTOR_OF_IMAGES);
-		vector<Mat> mats = op.getRecentOperationOnVector(false);
-
+		vector<Mat> mats = op.markCars();
 		string windowName = "window";
 
         for (decltype(mats.size()) i = 0; i < mats.size(); i++) {
