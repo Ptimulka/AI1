@@ -48,7 +48,7 @@ public:
         TeachingAlgorithm talg = INCREMENTAL;
         ActivationFunction afunc = LINEAR;
 
-        float training_eps = 1e-6;
+        float training_eps = 1e-6f;
 
 
         inline SimpleAnn produceAnn() const
