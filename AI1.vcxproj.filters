@@ -25,6 +25,18 @@
     <Filter Include="Source Files\io">
       <UniqueIdentifier>{e4b56eb7-ae99-4999-84c0-e341a38f0052}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ann">
+      <UniqueIdentifier>{2d2aa86f-0215-4a0e-a3b1-033d0f717d3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ann">
+      <UniqueIdentifier>{3ea562a7-6e4d-41af-8b8e-252e3f215436}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ann\cl">
+      <UniqueIdentifier>{3cbcdb10-af2f-4fec-ab34-c787a73c9634}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ann\cl">
+      <UniqueIdentifier>{3260b37d-ceff-4a9e-aeb4-37764b79db5b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -47,6 +59,27 @@
     </ClCompile>
     <ClCompile Include="src\debug.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ann\simple_ann.cpp">
+      <Filter>Source Files\ann</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ann\cl\ocldevice.cpp">
+      <Filter>Source Files\ann\cl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ann\cl\oclkernel.cpp">
+      <Filter>Source Files\ann\cl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ann\cl\oclplatform.cpp">
+      <Filter>Source Files\ann\cl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ann\cl\som.cpp">
+      <Filter>Source Files\ann\cl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ann\cl\oclmgr.cpp">
+      <Filter>Source Files\ann\cl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ann\cl\oclcontext.cpp">
+      <Filter>Source Files\ann\cl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -80,5 +113,40 @@
     <ClInclude Include="src\cmdopt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ann\simple_ann.h">
+      <Filter>Header Files\ann</Filter>
+    </ClInclude>
+    <ClInclude Include="src\typedefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ann\cl\som.h">
+      <Filter>Header Files\ann\cl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ann\cl\ocldevice.h">
+      <Filter>Header Files\ann\cl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ann\cl\oclkernel.h">
+      <Filter>Header Files\ann\cl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ann\cl\oclplatform.h">
+      <Filter>Header Files\ann\cl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ann\cl\oclmgr.h">
+      <Filter>Header Files\ann\cl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\optional.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ann\cl\oclcontext.h">
+      <Filter>Header Files\ann\cl</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\ann\cl\som.cl">
+      <Filter>Source Files\ann\cl</Filter>
+    </None>
+    <None Include="src\ann\cl\ffann_irpropp_logicf.cl">
+      <Filter>Source Files\ann\cl</Filter>
+    </None>
   </ItemGroup>
 </Project>

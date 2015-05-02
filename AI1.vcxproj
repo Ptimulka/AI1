@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -26,26 +26,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -66,28 +66,28 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\dev\dep\CUDA\include;$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\dev\dep\CUDA\lib;$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)_d</TargetName>
     <OutDir>bin\$(PlatformShortName)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\dev\dep\CUDA\include;$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\dev\dep\CUDA\lib;$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
     <OutDir>bin\$(PlatformShortName)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\dev\dep\CUDA\include;$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\dev\dep\CUDA\lib;$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
     <OutDir>bin\$(PlatformShortName)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\dev\dep\CUDA\include;$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\dev\dep\CUDA\lib;$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
     <OutDir>bin\$(PlatformShortName)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
   </PropertyGroup>
@@ -99,7 +99,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(PlatformShortName)\opencv_world300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:\dev\dep\CUDA\lib\Win32\OpenCL.lib;$(PlatformShortName)\opencv_world300d.lib;$(PlatformShortName)\fannfloatd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,7 +110,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(PlatformShortName)\opencv_world300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:\dev\dep\CUDA\lib\x64\OpenCL.lib;$(PlatformShortName)\opencv_world300d.lib;$(PlatformShortName)\fannfloatd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -125,7 +125,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(PlatformShortName)\opencv_world300.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:\dev\dep\CUDA\lib\Win32\OpenCL.lib;$(PlatformShortName)\opencv_world300.lib;$(PlatformShortName)\fannfloat.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -140,10 +140,17 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(PlatformShortName)\opencv_world300.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:\dev\dep\CUDA\lib\x64\OpenCL.lib;$(PlatformShortName)\opencv_world300.lib;$(PlatformShortName)\fannfloat.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ann\cl\oclcontext.cpp" />
+    <ClCompile Include="src\ann\cl\ocldevice.cpp" />
+    <ClCompile Include="src\ann\cl\oclkernel.cpp" />
+    <ClCompile Include="src\ann\cl\oclmgr.cpp" />
+    <ClCompile Include="src\ann\cl\oclplatform.cpp" />
+    <ClCompile Include="src\ann\cl\som.cpp" />
+    <ClCompile Include="src\ann\simple_ann.cpp" />
     <ClCompile Include="src\cmdopt.cpp" />
     <ClCompile Include="src\debug.cpp" />
     <ClCompile Include="src\ImageOperations.cpp" />
@@ -153,16 +160,29 @@
     <ClCompile Include="src\utils\log.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ann\cl\oclcontext.h" />
+    <ClInclude Include="src\ann\cl\ocldevice.h" />
+    <ClInclude Include="src\ann\cl\oclkernel.h" />
+    <ClInclude Include="src\ann\cl\oclmgr.h" />
+    <ClInclude Include="src\ann\cl\oclplatform.h" />
+    <ClInclude Include="src\ann\cl\som.h" />
+    <ClInclude Include="src\ann\simple_ann.h" />
     <ClInclude Include="src\cmdopt.h" />
     <ClInclude Include="src\ImageOperations.h" />
     <ClInclude Include="src\io\dir.h" />
+    <ClInclude Include="src\typedefs.h" />
     <ClInclude Include="src\utils\cmdline.h" />
     <ClInclude Include="src\utils\flag.h" />
     <ClInclude Include="src\utils\log.h" />
     <ClInclude Include="src\utils\nlqueue.h" />
+    <ClInclude Include="src\utils\optional.h" />
     <ClInclude Include="src\utils\singleton.h" />
     <ClInclude Include="src\utils\stringlist.h" />
     <ClInclude Include="src\utils\strutils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\ann\cl\ffann_irpropp_logicf.cl" />
+    <None Include="src\ann\cl\som.cl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
