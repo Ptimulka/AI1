@@ -1,0 +1,18 @@
+[Thread 8324 at 02 May 2015 16:40:56]:  OpenCL platform:
+[Thread 8324 at 02 May 2015 16:40:56]:      Name: NVIDIA CUDA
+[Thread 8324 at 02 May 2015 16:40:56]:      Vendor: NVIDIA Corporation
+[Thread 8324 at 02 May 2015 16:40:56]:      OpenCL version: 1.2
+[Thread 8324 at 02 May 2015 16:40:56]:      Device:
+[Thread 8324 at 02 May 2015 16:40:56]:          Name: GeForce GTX 970M
+[Thread 8324 at 02 May 2015 16:40:56]:          Vendor: NVIDIA Corporation
+[Thread 8324 at 02 May 2015 16:40:56]:          OpenCL version: 1.2
+[Thread 8324 at 02 May 2015 16:40:56]:          Adress bits: 32 (little-endian)
+[Thread 8324 at 02 May 2015 16:40:56]:          Avaliable compute units: 10
+[Thread 8324 at 02 May 2015 16:40:56]:          Clock frequency: 1038
+[Thread 8324 at 02 May 2015 16:40:56]:          Has image support: 1
+[Thread 8324 at 02 May 2015 16:40:56]:          Max image width: 16384
+[Thread 8324 at 02 May 2015 16:40:56]:          Max image height: 16384
+[Thread 8324 at 02 May 2015 16:40:56]:          Max work items: [1024, 1024, 64]
+[Thread 8324 at 02 May 2015 16:40:56]:          Has compiler: 1
+[Thread 8324 at 02 May 2015 16:40:56]:  
+[Thread 8324 at 02 May 2015 16:40:56]:  "ocl_compile_test.cl": OpenCL program build failed with error code: -6

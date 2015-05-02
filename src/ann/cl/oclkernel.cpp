@@ -31,14 +31,14 @@ OclKernel::OclKernel(string const& path, OclContext* context) : mypath(path)
 
     if (error != CL_SUCCESS)
     {
-        sLog.log("OpenCL program creation failed with error code: ", error);
+        sLog.log('"', mypath, "\": OpenCL program creation failed with error code: ", error);
         return;
     }
 
     myprogram = program;
     if ((error = clBuildProgram(program, 0, nullptr, "", nullptr, nullptr)) != CL_SUCCESS)
     {
-        sLog.log("OpenCL program build failed with eror code: ", error);
+        sLog.log('"', mypath, "\": OpenCL program build failed with error code: ", error);
         return;
     }
 
