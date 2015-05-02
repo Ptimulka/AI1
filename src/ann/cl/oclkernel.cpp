@@ -36,7 +36,8 @@ OclKernel::OclKernel(string const& path, OclContext* context) : mypath(path)
     }
 
     myprogram = program;
-    if ((error = clBuildProgram(program, 0, nullptr, "", nullptr, nullptr)) != CL_SUCCESS)
+	error = clBuildProgram(program, 0, nullptr, "", nullptr, nullptr);
+    if (error != CL_SUCCESS && error != CL_BUILD_PROGRAM_FAILURE)
     {
         sLog.log('"', mypath, "\": OpenCL program build failed with error code: ", error);
         return;
