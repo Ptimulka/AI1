@@ -3,10 +3,11 @@
 ImageOperations::ImageOperations(std::string referenceImagePath, std::vector<std::string> paths) {
 
 	referenceImageLoaded = false;
-	referenceImage = imread(referenceImagePath, IMREAD_COLOR);
-	if (referenceImage.data != NULL) {
+	Mat referenceImageMat = imread(referenceImagePath, IMREAD_COLOR);
+	if (referenceImageMat.data != NULL) {
 		referenceImageLoaded = true;
-		referenceImageGrayscale = imread(referenceImagePath, IMREAD_GRAYSCALE);
+		referenceImage = referenceImageMat.getUMat(ACCESS_RW);
+		referenceImageGrayscale = imread(referenceImagePath, IMREAD_GRAYSCALE).getUMat(ACCESS_RW);
 		recentOperation = referenceImage;
 		recentOperationGrayscale = referenceImageGrayscale;
 	}
@@ -25,8 +26,8 @@ ImageOperations::ImageOperations(std::string referenceImagePath, std::vector<std
 			return;
 		}
 		Mat nextGray = imread(paths.at(i), IMREAD_GRAYSCALE);
-		loadedImages.push_back(next);
-		loadedImagesGrayscale.push_back(nextGray);
+		loadedImages.push_back(next.getUMat(ACCESS_RW));
+		loadedImagesGrayscale.push_back(nextGray.getUMat(ACCESS_RW));
 	}
 
 	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); i++) {
@@ -52,13 +53,14 @@ ImageOperations::~ImageOperations() {
 
 bool ImageOperations::loadReferenceImage(std::string referenceImagePath) {
 
-	Mat referenceImage = imread(referenceImagePath, IMREAD_COLOR);
-	if (referenceImage.data != NULL) {
+	Mat referenceImageMat = imread(referenceImagePath, IMREAD_COLOR);
+	if (referenceImageMat.data != NULL) {
 		this->referenceImage = referenceImage;
 		referenceImageLoaded = true;
-		referenceImageGrayscale = imread(referenceImagePath, IMREAD_GRAYSCALE);
-		recentOperation = Mat(referenceImage);
-		recentOperationGrayscale = Mat(referenceImageGrayscale);
+		referenceImageGrayscale = imread(referenceImagePath, IMREAD_GRAYSCALE).getUMat(ACCESS_RW);
+		referenceImage = referenceImageMat.getUMat(ACCESS_RW);
+		recentOperation = UMat(referenceImage);
+		recentOperationGrayscale = UMat(referenceImageGrayscale);
 		return true;
 	}
 
@@ -71,8 +73,8 @@ bool  ImageOperations::loadVectorOfImages(std::vector<std::string> paths) {
 	if (paths.size() == 0)
 		return false;
 
-	std::vector<Mat> loadedImages;
-	std::vector<Mat> loadedImagesGrayscale;
+	std::vector<UMat> loadedImages;
+	std::vector<UMat> loadedImagesGrayscale;
 
 	for (decltype(paths.size()) i = 0; i < paths.size(); i++) {
 		Mat next = imread(paths.at(i), IMREAD_COLOR);
@@ -82,8 +84,8 @@ bool  ImageOperations::loadVectorOfImages(std::vector<std::string> paths) {
 			return false;
 		}
 		Mat nextGray = imread(paths.at(i), IMREAD_GRAYSCALE);
-		loadedImages.push_back(next);
-		loadedImagesGrayscale.push_back(nextGray);
+		loadedImages.push_back(next.getUMat(ACCESS_RW));
+		loadedImagesGrayscale.push_back(nextGray.getUMat(ACCESS_RW));
 	}
 
 	vectorOfImagesLoaded = true;
@@ -92,7 +94,7 @@ bool  ImageOperations::loadVectorOfImages(std::vector<std::string> paths) {
 
 	recentOperationOnVector.clear();
 	recentOperationOnVectorGrayscale.clear();
-	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); i++) {	
+	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); i++) {
 		recentOperationOnVector.push_back(loadedImages.at(i).clone());
 		recentOperationOnVectorGrayscale.push_back(loadedImagesGrayscale.at(i).clone());
 	}
@@ -132,14 +134,14 @@ void ImageOperations::pushRecentOperationOnReferenceImage() {
 }
 
 
-std::vector<Mat> ImageOperations::getRecentOperationOnVector(bool inColor) {
+std::vector<UMat> ImageOperations::getRecentOperationOnVector(bool inColor) {
 	if (inColor)
 		return recentOperationOnVector;
 	return recentOperationOnVectorGrayscale;
 }
 
 
-Mat ImageOperations::getRecentOperationOnReferenceImage(bool inColor) {
+UMat ImageOperations::getRecentOperationOnReferenceImage(bool inColor) {
 	if (inColor)
 		return recentOperation;
 	return recentOperationGrayscale;
@@ -164,9 +166,9 @@ bool ImageOperations::imagesDifference(bool useUserReferenceImage, bool doItWise
 	else {
 
 
-		Mat mean = Mat::zeros(recentOperationOnVector.at(0).rows, recentOperationOnVector.at(0).cols, CV_32FC3);
-		Mat meanGrayscale = Mat::zeros(recentOperationOnVector.at(0).rows, recentOperationOnVector.at(0).cols, CV_32FC1);
-		Mat convertedToFloat;
+		UMat mean = UMat::zeros(recentOperationOnVector.at(0).rows, recentOperationOnVector.at(0).cols, CV_32FC3);
+		UMat meanGrayscale = UMat::zeros(recentOperationOnVector.at(0).rows, recentOperationOnVector.at(0).cols, CV_32FC1);
+		UMat convertedToFloat;
 
 		for (decltype(sizeOfVector) i = 0; i < sizeOfVector; i++) {
 			recentOperationOnVector.at(i).convertTo(convertedToFloat, CV_32FC3);	//
@@ -176,43 +178,60 @@ bool ImageOperations::imagesDifference(bool useUserReferenceImage, bool doItWise
 		}
 
 
-		mean = mean / sizeOfVector;
+		//divide() - ???
+		//mean = ((Mat)(mean.getMat(ACCESS_RW) / sizeOfVector)).getUMat(ACCESS_RW);	// niedziala, assert cos z pamiecia, referencja czy cos
+		UMat jedynki = UMat::ones(mean.size(), CV_32FC3);
+		divide(mean, jedynki, mean, 1.0 / sizeOfVector);
 		mean.convertTo(mean, CV_8U);
 
-		meanGrayscale = meanGrayscale / sizeOfVector;
+		UMat jedynki2 = UMat::ones(mean.size(), CV_32FC1);
+		//jedynki.convertTo(jedynki, CV_32FC1);
+		divide(meanGrayscale, jedynki2, meanGrayscale, 1.0 / sizeOfVector);
+		//meanGrayscale = ((Mat)(meanGrayscale.getMat(ACCESS_RW) / sizeOfVector)).getUMat(ACCESS_RW);
 		meanGrayscale.convertTo(meanGrayscale, CV_8U);
-		
+
+
+		Mat meanGrayscaleMat = meanGrayscale.getMat(ACCESS_RW);
+
+
+		std::vector < Mat > maty;
+		for (decltype(sizeOfVector) i = 0; i < sizeOfVector; i++) {
+			maty.push_back(recentOperationOnVectorGrayscale.at(i).getMat(ACCESS_RW));
+		}
+
+
+
 		if (doItWiselyButLong) {		//niech spadaj¹ te z podejrzanych odchyleniem
 
 			for (int y = 0; y < meanGrayscale.rows; y++) {
 				for (int x = 0; x < meanGrayscale.cols; x++) {
-					
+
 					//dla grayscale 
 					float standardDeviation = 0;
-					float average = (float)(meanGrayscale.at<unsigned char>(cv::Point(x, y)));
+					float average = (float)(meanGrayscaleMat.at<unsigned char>(cv::Point(x, y)));
 
 					for (decltype(sizeOfVector) i = 0; i < sizeOfVector; i++)
-						standardDeviation += abs((float)(recentOperationOnVectorGrayscale.at(i).at<unsigned char>(cv::Point(x, y))) - average);
-					
+						standardDeviation += abs((float)(maty.at(i).at<unsigned char>(cv::Point(x, y))) - average);
+
 					standardDeviation /= sizeOfVector;
 
 					int notSuspected = sizeOfVector;
-					
+
 					float averageChanged = average;
 					for (decltype(sizeOfVector) i = 0; i < sizeOfVector; i++) {
 
-						if (abs((float)(recentOperationOnVectorGrayscale.at(i).at<unsigned char>(cv::Point(x, y))) - average) > standardDeviation) {
-							averageChanged = averageChanged - ((float)(recentOperationOnVectorGrayscale.at(i).at<unsigned char>(cv::Point(x, y)))) / notSuspected;
-							averageChanged *= ((float)notSuspected); 
+						if (abs((float)(maty.at(i).at<unsigned char>(cv::Point(x, y))) - average) > standardDeviation) {
+							averageChanged = averageChanged - ((float)(recentOperationOnVectorGrayscale.at(i).getMat(ACCESS_RW).at<unsigned char>(cv::Point(x, y)))) / notSuspected;
+							averageChanged *= ((float)notSuspected);
 							notSuspected--;
 							//raczej nie bêdzie asserta, bo to niemo¿liwe, ¿e wszystkie bêdê mia³y odchylenie wiêksze ni¿ standardowe
 							assert(notSuspected != 0);
 							averageChanged /= ((float)notSuspected);
 						}
-					
+
 					}
 
-					meanGrayscale.at<unsigned char>(cv::Point(x, y)) = (unsigned char)averageChanged;
+					meanGrayscaleMat.at<unsigned char>(cv::Point(x, y)) = (unsigned char)averageChanged;
 
 					//dla kolorowego
 
@@ -220,10 +239,10 @@ bool ImageOperations::imagesDifference(bool useUserReferenceImage, bool doItWise
 					Vec3f standardDeviation3 = Vec3f(0, 0, 0);
 
 					for (decltype(sizeOfVector) i = 0; i < sizeOfVector; i++) {
-						Vec3f dif = ((Vec3f)(recentOperationOnVectorGrayscale.at(i).at<Vec3b>(cv::Point(x, y))) - average3);
-						standardDeviation3[0] += abs(dif[0]);
-						standardDeviation3[1] += abs(dif[1]);
-						standardDeviation3[2] += abs(dif[2]);
+					Vec3f dif = ((Vec3f)(recentOperationOnVectorGrayscale.at(i).at<Vec3b>(cv::Point(x, y))) - average3);
+					standardDeviation3[0] += abs(dif[0]);
+					standardDeviation3[1] += abs(dif[1]);
+					standardDeviation3[2] += abs(dif[2]);
 					}
 
 					standardDeviation3 = standardDeviation3 / sizeOfVector;
@@ -234,10 +253,16 @@ bool ImageOperations::imagesDifference(bool useUserReferenceImage, bool doItWise
 
 		}
 
+		//recentOperationOnVectorGrayscale.clear();
+		//for (decltype(sizeOfVector) i = 0; i < sizeOfVector; i++) {
+		//	recentOperationOnVectorGrayscale.push_back(maty.at(i).getUMat(ACCESS_RW));
+		//	//maty.at(i).copyTo(recentOperationOnVectorGrayscale.at(i));
+		//}
+
+		maty.clear();
+		meanGrayscaleMat.release();
 
 		for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
-
-			absdiff(recentOperationOnVector.at(i), mean, recentOperationOnVector.at(i));
 			absdiff(recentOperationOnVectorGrayscale.at(i), meanGrayscale, recentOperationOnVectorGrayscale.at(i));
 		}
 
@@ -254,7 +279,7 @@ bool ImageOperations::detectEdges(makeOperationOn makeOn) {
 
 	if (makeOn == ALL || makeOn == VECTOR_OF_IMAGES) {
 
-        for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
+		for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
 			Canny(recentOperationOnVector.at(i), recentOperationOnVector.at(i), 10, 30, 3);
 			Canny(recentOperationOnVectorGrayscale.at(i), recentOperationOnVectorGrayscale.at(i), 10, 30, 3);
 		}
@@ -275,7 +300,7 @@ bool ImageOperations::blurImages(makeOperationOn makeOn, int size) {
 
 	if (makeOn == ALL || makeOn == VECTOR_OF_IMAGES) {
 
-        for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
+		for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
 			blur(recentOperationOnVector.at(i), recentOperationOnVector.at(i), Size(size, size));
 			blur(recentOperationOnVectorGrayscale.at(i), recentOperationOnVectorGrayscale.at(i), Size(size, size));
 		}
@@ -296,7 +321,7 @@ bool ImageOperations::medianFiltr(makeOperationOn makeOn, int size) {
 
 	if (makeOn == ALL || makeOn == VECTOR_OF_IMAGES) {
 
-        for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
+		for (decltype(recentOperationOnVector.size()) i = 0; i < recentOperationOnVector.size(); i++) {
 			medianBlur(recentOperationOnVector.at(i), recentOperationOnVector.at(i), size);
 			medianBlur(recentOperationOnVectorGrayscale.at(i), recentOperationOnVectorGrayscale.at(i), size);
 		}
@@ -336,19 +361,19 @@ bool ImageOperations::isContourOk(std::vector<Point> contour, int sizeMin) {
 	if (contour.size() < 20)
 		return false;
 	return true;
-	
+
 }
 
 
-Mat ImageOperations::markCars(int whichImage, unsigned char red, unsigned char green, unsigned char blue) {
+UMat ImageOperations::markCars(int whichImage, unsigned char red, unsigned char green, unsigned char blue) {
 
 	int minArea = 300;
 
-	if (!isVectorOfImagesLoaded() || !(recentOperationOnVectorGrayscale.size() > whichImage)) 
-		return Mat();
+	if (!isVectorOfImagesLoaded() || !(recentOperationOnVectorGrayscale.size() > whichImage))
+		return UMat();
 
 	if (loadedImagesGrayscale.size() <= whichImage)
-		return Mat();
+		return UMat();
 
 	std::vector<Vec4i> hierarchy;
 	std::vector<std::vector<Point> > contours;
@@ -356,7 +381,7 @@ Mat ImageOperations::markCars(int whichImage, unsigned char red, unsigned char g
 	Canny(recentOperationOnVectorGrayscale.at(whichImage), recentOperationOnVectorGrayscale.at(whichImage), thresh, thresh * 2, 3);
 
 	findContours(recentOperationOnVectorGrayscale.at(whichImage), contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
-	
+
 	//wyrzucamy kontury o ma³ej d³ugoœci
 	std::vector< std::vector<Point> >::iterator iter;
 	for (iter = contours.begin(); iter != contours.end();) {
@@ -386,12 +411,12 @@ Mat ImageOperations::markCars(int whichImage, unsigned char red, unsigned char g
 	bool *isAlreadyJoinedWithOther = new bool[contours.size()];
 	for (decltype(contours.size()) i = 0; i < contours.size(); i++)
 		isAlreadyJoinedWithOther[i] = false;
-	std::vector<Mat> samochody;
+	std::vector<UMat> samochody;
 
 	for (decltype(contours.size()) i = 0; i < contours.size(); i++) {
 
-		auto img = loadedImagesGrayscale.at(whichImage)(rectangles[i]);		
-		rectangle(loadedImages.at(whichImage), rectangles[i], Scalar(red, green, blue));
+		auto img = loadedImagesGrayscale.at(whichImage)(rectangles[i]);
+		rectangle(loadedImages.at(whichImage).getMat(ACCESS_RW), rectangles[i], Scalar(red, green, blue));
 
 		//³¹czymy z konturem innym który mo¿e byc czeœci¹ tego samego samochodu
 		if (!isAlreadyJoinedWithOther[i]) {
@@ -402,7 +427,7 @@ Mat ImageOperations::markCars(int whichImage, unsigned char red, unsigned char g
 					if (rect3.area() > 0.5*rectangles[i].area() && rect3.area() > 0.5*rectangles[3].area()) {
 						//juhuuu, pokrywaj¹ siê!
 						Rect rect4 = rectangles[i] | rectangles[j];
-						rectangle(loadedImages.at(whichImage), rect4, Scalar(10));
+						rectangle(loadedImages.at(whichImage).getMat(ACCESS_RW), rect4, Scalar(10));
 						isAlreadyJoinedWithOther[i] = true;
 						isAlreadyJoinedWithOther[j] = true;
 						break;
@@ -415,8 +440,8 @@ Mat ImageOperations::markCars(int whichImage, unsigned char red, unsigned char g
 
 
 		}
-		samochody.push_back(std::move(img));		
-	
+		samochody.push_back(std::move(img));
+
 	}
 
 	//RNG rng(12345);	//generator losowych liczb 
@@ -424,15 +449,41 @@ Mat ImageOperations::markCars(int whichImage, unsigned char red, unsigned char g
 	//	Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 	//	drawContours(loadedImagesGrayscale.at(whichImage), contours, i, color, 2, 8, hierarchy, 0, Point());
 	//}
-	
+
 	return loadedImages.at(whichImage);
 }
 
-std::vector<Mat> ImageOperations::markCars(unsigned char red, unsigned char green, unsigned char blue)
+std::vector<UMat> ImageOperations::markCars(unsigned char red, unsigned char green, unsigned char blue)
 {
-	std::vector<Mat> ret;
-	for (int i = 0; i < min(loadedImages.size(), loadedImagesGrayscale.size()); ++i)
+	std::vector<UMat> ret;
+	for (int i = 0; i < loadedImages.size(); ++i)
 		ret.push_back(markCars(i, red, green, blue));
 
 	return ret;
+}
+
+
+void ImageOperations::robCosZebyZajacGPU() {
+
+	int size = 9;
+	for (int j = 0; j < loadedImages.size(); ++j){
+
+		/*for (int i = 0; i < 100; i++) {
+			medianBlur(recentOperationOnVector.at(j), recentOperationOnVector.at(j), size);
+			blur(recentOperationOnVector.at(j), recentOperationOnVector.at(j), Size(size, size));
+		}*/
+		
+		/*for (int i = 0; i < 100; i++)
+			addWeighted(recentOperationOnVector.at(j), 0.2, recentOperationOnVector.at(j), 0.5, 0.1, recentOperationOnVector.at(j));
+		*/
+		for (int i = 0; i < 3000; i++)
+			Sobel(recentOperationOnVectorGrayscale.at(j), recentOperationOnVectorGrayscale.at(j), CV_16S, 1, 0);
+
+		/*for (int i = 0; i < 100; i++)
+			multiply(recentOperationOnVector.at(j), recentOperationOnVector.at(j), recentOperationOnVector.at(j), 0.5);
+		*/
+	}
+
+
+
 }

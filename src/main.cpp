@@ -117,24 +117,36 @@ int main(int argc, char** argv)
 
         ImageOperations op;
 
+		cv::ocl::setUseOpenCL(true);
+
         //ktore razem z obrazkiem referencyjnym ladujemy do ImageOperations
         op.loadReferenceImage(convert<wstring,string>(refimg.front()));
         op.loadVectorOfImages(imageNames);
 
+		int poczatek = clock();
+
         //z ktorymi cos potem robimy (to juz nie moje ;d)
-        op.medianFiltr(op.ALL, 7);
+        //op.medianFiltr(op.ALL, 7);
 
 		//do wyboru opcja1:
 		//op.imagesDifference();
 		
 		//lub opcja2, kiedy nie mamy obrazka referencyjnego, false - nie mamy ref, true - chcemy u¿yæ algorytmu z odchyleniem standardowym
-		op.imagesDifference(false, true);			
+		//op.imagesDifference(false, true);			
+
+		//op.medianFiltr(op.ALL, 7);
+
+		op.robCosZebyZajacGPU();
 
 
-		op.threshold(20, op.VECTOR_OF_IMAGES);
 
-		vector<Mat> mats = op.markCars();
+		//vector<Mat> mats = op.markCars();
+		vector<UMat> mats = op.getRecentOperationOnVector(true);
 		string windowName = "window";
+
+		int czas = clock() - poczatek;
+
+		sLog.log("Tyle czasu zajelo przetwarzanie obrazkow: " + std::to_string(czas));
 
         for (decltype(mats.size()) i = 0; i < mats.size(); i++) {
 			namedWindow(windowName + std::to_string(i), WINDOW_AUTOSIZE);

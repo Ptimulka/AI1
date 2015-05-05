@@ -6,6 +6,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/video/background_segm.hpp"
 #include "opencv2/opencv.hpp"
+#include "opencv2/core/ocl.hpp"
 
 #include <vector>
 #include <assert.h>
@@ -16,20 +17,20 @@ using namespace cv;
 class ImageOperations {
 
 private:
-	Mat referenceImage;
-	Mat referenceImageGrayscale;
-	Mat recentOperation;
-	Mat recentOperationGrayscale;
-	std::vector<Mat> savedOperationsOnReferenceImage;
-	std::vector<Mat> savedOperationsOnReferenceImageGrayscale;
-	Mat meanImage;
+	UMat referenceImage;
+	UMat referenceImageGrayscale;
+	UMat recentOperation;
+	UMat recentOperationGrayscale;
+	std::vector<UMat> savedOperationsOnReferenceImage;
+	std::vector<UMat> savedOperationsOnReferenceImageGrayscale;
+	UMat meanImage;
 
-	std::vector<Mat> loadedImages;
-	std::vector<Mat> loadedImagesGrayscale;
-	std::vector<Mat> recentOperationOnVector;
-	std::vector<Mat> recentOperationOnVectorGrayscale;
-	std::vector<std::vector<Mat>> savedOperationsOnVector;
-	std::vector<std::vector<Mat>> savedOperationsOnVectorGrayscale;
+	std::vector<UMat> loadedImages;
+	std::vector<UMat> loadedImagesGrayscale;
+	std::vector<UMat> recentOperationOnVector;
+	std::vector<UMat> recentOperationOnVectorGrayscale;
+	std::vector<std::vector<UMat>> savedOperationsOnVector;
+	std::vector<std::vector<UMat>> savedOperationsOnVectorGrayscale;
 
 	bool referenceImageLoaded;
 	bool vectorOfImagesLoaded;
@@ -71,9 +72,9 @@ public:
 	void pushRecentOperationOnReferenceImage();
 
 	//pobranie obrazków w stanie po ostatniej operacji na nich
-	std::vector<Mat> getRecentOperationOnVector(bool inColor = true);
+	std::vector<UMat> getRecentOperationOnVector(bool inColor = true);
 	//pobranie obrazka referencyjnego w stanie po ostatniej operacji na nim
-	Mat getRecentOperationOnReferenceImage(bool inColor = true);
+	UMat getRecentOperationOnReferenceImage(bool inColor = true);
 
 
 	//poni¿sze funkcje wykonuj¹ operacje na ca³ym wektorku za³adowanych obrazów
@@ -93,8 +94,10 @@ public:
 
 
 	//funkcja obczajaj¹ca kontury
-	Mat markCars(int whichImage, unsigned char red = 255, unsigned char green = 0, unsigned char blue = 0);
-	std::vector<Mat> markCars(unsigned char red = 255, unsigned char green = 0, unsigned char blue = 0);
+	UMat markCars(int whichImage, unsigned char red = 255, unsigned char green = 0, unsigned char blue = 0);
+	std::vector<UMat> markCars(unsigned char red = 255, unsigned char green = 0, unsigned char blue = 0);
+
+	void robCosZebyZajacGPU();
 
 };
 
