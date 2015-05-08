@@ -120,28 +120,37 @@ int main(int argc, char** argv)
 		cv::ocl::setUseOpenCL(true);
 
         //ktore razem z obrazkiem referencyjnym ladujemy do ImageOperations
-        op.loadReferenceImage(convert<wstring,string>(refimg.front()));
-        op.loadVectorOfImages(imageNames);
+        //op.loadReferenceImage(convert<wstring,string>(refimg.front()));	//nie ma juz tego, w ogole nie bedziemy brali od uwage obrazka referencyjnego!
+        
+		//jesli loadVectorOfImages zwraca NIE zero to znaczy ze blad
+		ImageOperations::ImagesErrors loaded = op.loadVectorOfImages(imageNames);
+		if (loaded) {
+			//mozemy sprawdzic blad np:
+			if (loaded == ImageOperations::DIFFERENT_SIZES) {
+				sLog.log("obrazki maja rozne wymiary!\n");
+				return 1;
+			}
+		}
 
 		int poczatek = clock();
-
-        //z ktorymi cos potem robimy (to juz nie moje ;d)
-        //op.medianFiltr(op.ALL, 7);
-
-		//do wyboru opcja1:
-		//op.imagesDifference();
 		
-		//lub opcja2, kiedy nie mamy obrazka referencyjnego, false - nie mamy ref, true - chcemy u¿yæ algorytmu z odchyleniem standardowym
-		//op.imagesDifference(false, true);			
+        //z ktorymi cos potem robimy (to juz nie moje ;d)
 
-		//op.medianFiltr(op.ALL, 7);
+		//KOMENT MARTY: polecam na releasie, bo inczej stracicie cierpliwosc, mozecie poprobowac rozne wartosci tam nizej
+		//zeby obczaic jakie sa najlepsze
+		//mozecie tez sprobowac tam wyzej ustawic opencl na false i porownac czy jest jakas roznica w czasie u Was
 
-		op.robCosZebyZajacGPU();
+		//ta funkcja robi wszystko :)
+		//parametry to kolejno: rozmiar filtra rozmazujacego (NIEPARZYSTA), ile razy chcemy rozmazywac,
+		//thresh (powyzej jakiej wartosci piksel uznajemy za bialy korzystajac z funckji uznanej przez Alka za rasistowska) - zakres unsigned chara
+		//i kolor podajac r,g,b
+		//prostokaty powstale przez polaczenie dwoch zostana namalowane podobnym kolorem
+		//mozna po kolei wywolywac funkcje dla roznych parametrow i kolorow, dzieki czemu latwiej porownac :)
+		op.markCarsWithOptions(7, 3, 40, Scalar(200, 200, 0));	//turkusowy
+		op.markCarsWithOptions(7, 3, 20, Scalar(200, 0, 0));	//niebieski
 
 
-
-		//vector<Mat> mats = op.markCars();
-		vector<UMat> mats = op.getRecentOperationOnVector(true);
+		vector<UMat> mats = op.getLoadedImages();
 		string windowName = "window";
 
 		int czas = clock() - poczatek;
