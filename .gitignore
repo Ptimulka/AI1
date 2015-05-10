@@ -1,4 +1,4 @@
-
+﻿
 *.opensdf
 *.sdf
 *.suo
@@ -6,7 +6,9 @@
 bin/*/*.exe
 bin/*/*.pdb
 bin/*/*.ilk
+bin/*/*.log
 tmp/*
+bin/working_dir/*.log
 
 # część domyślna
 
