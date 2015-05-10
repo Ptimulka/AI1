@@ -27,7 +27,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -66,28 +66,28 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>D:\dev\dep\CUDA\include;$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\dev\dep\CUDA\lib;$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)_d</TargetName>
     <OutDir>bin\$(PlatformShortName)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>D:\dev\dep\CUDA\include;$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\dev\dep\CUDA\lib;$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
     <OutDir>bin\$(PlatformShortName)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>D:\dev\dep\CUDA\include;$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\dev\dep\CUDA\lib;$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
     <OutDir>bin\$(PlatformShortName)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>D:\dev\dep\CUDA\include;$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\dev\dep\CUDA\lib;$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)include;$(SolutionDir)src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)lib;$(LibraryPath)</LibraryPath>
     <OutDir>bin\$(PlatformShortName)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
   </PropertyGroup>
@@ -135,6 +135,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -142,6 +143,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>$(PlatformShortName)\OpenCL.lib;$(PlatformShortName)\opencv_world300.lib;$(PlatformShortName)\fannfloat.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ann\cl\oclcontext.cpp" />
