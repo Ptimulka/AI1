@@ -8,6 +8,8 @@ bin/*/*.pdb
 bin/*/*.ilk
 bin/*/*.log
 tmp/*
+bin/*/*140.dll
+bin/*/*140d.dll
 bin/working_dir/*.log
 
 # część domyślna
