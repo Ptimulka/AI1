@@ -1,9 +1,0 @@
-﻿Co gdzie jest:
-bin - pliki wykonywane. Dla 32-bit w podkatalogu x86, dla 64 analogicznie. Poza dll pojawiają się tam też nasze .exe itd. :)
-        Podkatalog "working_dir" zawiera wszystkie dane zewnetrzne, jakie są potrzebne naszej aplikacji do działania. De facto działa to tak,
-        jakbyśmy uruchamiali aplikację wewnątrz tego katalog (patrz w visualu: projekt -> Properties -> Debugging -> Working Dir).
-        Jeśli chcemy "zainstalować" aplikację, kopiujemy do jednego folderu wszystko z katalogu "working_dir" i plik exe razem z dll z odpowiedniego katalogu x86/x64
-include - zewnętrzne nagłówki (Visual będzie szukał w tym katalogu plików w trakcie szukania plików przy includach, patch: projekt -> Properties -> VC++ Directories)
-lib - pliki lib dla linkera (patrz j.w.), odpowiednie podkatalogi dla platform x86 i x64
-src - nasze pliki zródłowe
-tmp - tutaj pojawią się pliki pośrednie w trakcie kompilacji (*.o itd.), w całości ignorowane
