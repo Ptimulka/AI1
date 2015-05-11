@@ -155,7 +155,7 @@ int main(int argc, char** argv)
 
 		int czas = clock() - poczatek;
 
-		sLog.log("Tyle czasu zajelo przetwarzanie obrazkow: " + std::to_string(czas));
+		sLog.log("Tyle czasu zajelo przetwarzanie obrazkow: ", czas);
 
         for (decltype(mats.size()) i = 0; i < mats.size(); i++) {
 			namedWindow(windowName + std::to_string(i), WINDOW_AUTOSIZE);
