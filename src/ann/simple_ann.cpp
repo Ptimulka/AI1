@@ -1,5 +1,4 @@
 #include "simple_ann.h"
-#include "fann.h"
 using namespace std;
 
 SimpleAnn::SimpleAnn(const Config * anncfg) : SimpleAnn(shared_ptr<const SimpleAnn::Config>(new Config(*anncfg)))
