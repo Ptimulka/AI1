@@ -187,12 +187,13 @@ void ImageOperations::markCars(UMat & mat) {
 	for (decltype(contours.size()) i = 0; i < contours.size(); i++) {
 
 		//³¹czymy z konturem innym który mo¿e byc czeœci¹ tego samego samochodu
-		if (!isAlreadyJoinedWithOther[i]) {
+		//if (!isAlreadyJoinedWithOther[i]) {
 			for (decltype(contours.size()) j = 0; j < contours.size(); j++) {
-				if (i != j && !isAlreadyJoinedWithOther[i]) {
+				//if (i != j && !isAlreadyJoinedWithOther[i]) {
+				if (i != j) {
 					Rect rect3 = rectangles[i] & rectangles[j];
 					//warunek pokrycia prostok¹tów
-					if (rect3.area() > 0.5*rectangles[i].area() && rect3.area() > 0.5*rectangles[3].area()) {
+					if (rect3.area() > 0.5*rectangles[i].area() || rect3.area() > 0.5*rectangles[j].area()) {
 						//juhuuu, pokrywaj¹ siê!
 						Rect rect4 = rectangles[i] | rectangles[j];
 						rectanglesGenerated.push_back(rect4);
@@ -207,7 +208,7 @@ void ImageOperations::markCars(UMat & mat) {
 			}
 
 
-		}
+		//}
 
 	}
 	

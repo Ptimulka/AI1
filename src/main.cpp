@@ -143,12 +143,12 @@ int main(int argc, char** argv)
 		//ta funkcja robi wszystko :)
 		//parametry to kolejno: rozmiar filtra rozmazujacego (NIEPARZYSTA), ile razy chcemy rozmazywac,
 		//thresh (powyzej jakiej wartosci piksel uznajemy za bialy korzystajac z funckji uznanej przez Alka za rasistowska) - zakres unsigned chara
-		//i kolor podajac r,g,b
+		//i kolor podajac b,r,g
 		//prostokaty powstale przez polaczenie dwoch zostana namalowane podobnym kolorem
 		//mozna po kolei wywolywac funkcje dla roznych parametrow i kolorow, dzieki czemu latwiej porownac :)
-		op.markCarsWithOptions(7, 3, 40, Scalar(200, 200, 0));	//turkusowy
+		op.markCarsWithOptions(7, 3, 40, Scalar(200, 200, 0));	//turkusowy czy tez seledynowy w kazdym razie bardziej zielony
 		op.markCarsWithOptions(7, 3, 20, Scalar(200, 0, 0));	//niebieski
-
+		op.markCarsWithOptions(7, 3, 10, Scalar(0, 0, 200));	//czerwoniutki
 
 		vector<UMat> mats = op.getLoadedImages();
 		string windowName = "window";
