@@ -67,26 +67,26 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)..\..\include;$(SolutionDir)..\..\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\vs120;$(SolutionDir)..\..\src;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\lib\vs120\$(PlatformShortName)\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>..\..\bin\vs120\$(PlatformShortName)\$(Configuration)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>$(SolutionDir)..\..\include;$(SolutionDir)..\..\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\vs120;$(SolutionDir)..\..\src;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\lib\vs120\$(PlatformShortName)\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>..\..\bin\vs120\$(PlatformShortName)\$(Configuration)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)..\..\include;$(SolutionDir)..\..\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\vs120;$(SolutionDir)..\..\src;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\lib\vs120\$(PlatformShortName)\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>..\..\bin\vs120\$(PlatformShortName)\$(Configuration)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)..\..\include;$(SolutionDir)..\..\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\..\include;$(SolutionDir)..\..\include\vs120;$(SolutionDir)..\..\src;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\lib\vs120\$(PlatformShortName)\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>..\..\bin\vs120\$(PlatformShortName)\$(Configuration)\</OutDir>
     <IntDir>tmp\$(Configuration)_$(PlatformShortName)\</IntDir>
