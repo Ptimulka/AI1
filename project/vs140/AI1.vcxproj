@@ -154,6 +154,8 @@
     <ClCompile Include="..\..\src\ann\cl\oclmgr.cpp" />
     <ClCompile Include="..\..\src\ann\cl\oclplatform.cpp" />
     <ClCompile Include="..\..\src\ann\cl\som.cpp" />
+    <ClCompile Include="..\..\src\ann\fann_irpropp_locigal.cpp" />
+    <ClCompile Include="..\..\src\ann\fann_irprop_logical.cpp" />
     <ClCompile Include="..\..\src\ann\simple_ann.cpp" />
     <ClCompile Include="..\..\src\cmdopt.cpp" />
     <ClCompile Include="..\..\src\debug.cpp" />
@@ -170,6 +172,7 @@
     <ClInclude Include="..\..\src\ann\cl\oclmgr.h" />
     <ClInclude Include="..\..\src\ann\cl\oclplatform.h" />
     <ClInclude Include="..\..\src\ann\cl\som.h" />
+    <ClInclude Include="..\..\src\ann\fann_irprop_logical.h" />
     <ClInclude Include="..\..\src\ann\simple_ann.h" />
     <ClInclude Include="..\..\src\cmdopt.h" />
     <ClInclude Include="..\..\src\ImageOperations.h" />
