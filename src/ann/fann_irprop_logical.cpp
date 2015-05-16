@@ -237,8 +237,11 @@ void FanniRPROP::_initLearningWorkers(Session* new_session)
         tptr = new thread([new_session, this](uint myneuron, uint prevneuron) {
             while (new_session->exists)
             {
-                while (!new_session->run)
+                while (!new_session->run && new_session->exists)
                     this_thread::sleep_for(chrono::milliseconds(100));
+
+                if (!new_session->exists)
+                    break;
 
                 new_session->working.fetch_add(1);
 
@@ -330,8 +333,11 @@ void FanniRPROP::_initRunningWorkers(Session* new_session) const
         tptr = new thread([new_session, this](uint myneuron, uint prevneuron) {
             while (new_session->exists)
             {
-                while (!new_session->run)
+                while (!new_session->run && new_session->exists)
                     this_thread::sleep_for(chrono::milliseconds(100));
+
+                if (!new_session->exists)
+                    break;
 
                 new_session->working.fetch_add(1);
 
@@ -371,4 +377,25 @@ FanniRPROP::Session::Session(uint layers, uint nodes) : outputs(nullptr, layers,
 
 FanniRPROP::Session::~Session()
 {
+    exists = false;
+    for (auto& t : workers)
+    {
+        t->join();
+        delete t;
+        t = nullptr;
+    }
+
+    for (auto& _o : outputs)
+        for (auto& a : _o)
+        {
+            delete a;
+            a = nullptr;
+        }
+
+    for (auto& _d : d)
+        for (auto& a : _d)
+        {
+            delete a;
+            a = nullptr;
+        }
 }
