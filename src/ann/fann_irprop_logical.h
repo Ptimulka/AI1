@@ -73,6 +73,11 @@ public:
     void save(std::ostream& out);
     void load(std::istream& in);
 
+    static void deleteSession(void* session)
+    {
+        delete reinterpret_cast<Session*>(session);
+    }
+
 private:
     struct Node
     {
