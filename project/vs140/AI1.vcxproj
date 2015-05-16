@@ -154,7 +154,6 @@
     <ClCompile Include="..\..\src\ann\cl\oclmgr.cpp" />
     <ClCompile Include="..\..\src\ann\cl\oclplatform.cpp" />
     <ClCompile Include="..\..\src\ann\cl\som.cpp" />
-    <ClCompile Include="..\..\src\ann\fann_irpropp_locigal.cpp" />
     <ClCompile Include="..\..\src\ann\fann_irprop_logical.cpp" />
     <ClCompile Include="..\..\src\ann\simple_ann.cpp" />
     <ClCompile Include="..\..\src\cmdopt.cpp" />

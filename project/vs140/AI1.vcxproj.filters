@@ -81,11 +81,8 @@
     <ClCompile Include="..\..\src\ann\cl\oclcontext.cpp">
       <Filter>Source Files\ann\cl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ann\fann_irpropp_locigal.cpp">
-      <Filter>Source Files\ann</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\ann\fann_irprop_logical.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\ann</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
