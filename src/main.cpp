@@ -175,7 +175,7 @@ int main(int argc, char** argv)
 			//imshow(windowName + std::to_string(groupNumber) + "_" + std::to_string(i), mats[i]);
 
 			///ale zapisywanko
-			std::string gdzie = "./wyprod/obr" + std::to_string(groupNumber) + "_" + std::to_string(i) + ".jpg";
+			std::string gdzie = "./markedCars/obr" + std::to_string(groupNumber) + "_" + std::to_string(i) + ".jpg";
 			imwrite(gdzie, mats[i]);
         }
 
