@@ -52,6 +52,8 @@ ImageOperations::ImagesErrors ImageOperations::loadVectorOfImages(std::vector<st
 	//stwarzamy od razu obrazek sredni
 	createMeanImage();
 
+	Mat jakas = meanImageGrayscale.getMat(ACCESS_RW);
+
 	return ImageOperations::OK;
 }
 
@@ -247,6 +249,61 @@ void ImageOperations::markCarsWithOptions(int size, int numberOfBlurs, int thres
 
 
 }
+
+
+
+void ImageOperations::addToThresholdedWithOptions(int size, int numberOfBlurs, std::vector<int> threshes, Scalar color) {
+
+	UMat temp;
+	UMat temp2;
+	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
+		temp = loadedImagesGrayscale[i].clone();
+		absdiff(temp, meanImageGrayscale, temp);
+		for (int j = 0; j < numberOfBlurs; j++)
+			medianBlur(temp, temp, size);
+		for (decltype(threshes.size()) k = 0; k < threshes.size(); k++) {
+			cv::threshold(temp, temp2, threshes[k], 255, THRESH_BINARY);	//255 = bia³y
+			vectorsOfThresholded[i].push_back(temp2.clone());
+
+
+		}
+	}
+
+
+
+}
+
+void ImageOperations::mixThresholded() {
+
+	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
+
+		//dla kazdego obrazka robimy srednia thresholdow
+
+		UMat meanImageThresholded = UMat::zeros(sizeOfImage, CV_32FC1);
+		UMat convertedToFloat;
+
+		decltype(vectorsOfThresholded[i].size()) sizeOfVector = vectorsOfThresholded[i].size();
+
+		//dodajemy obrazki do siebie, musza byc floatami, bo inaczej unsigned char sie przekreci chyba
+		for (decltype(sizeOfVector) j = 0; j < sizeOfVector; j++) {
+			vectorsOfThresholded[i][j].convertTo(convertedToFloat, CV_32FC1);
+			accumulate(convertedToFloat, meanImageThresholded);
+		}
+
+		//mamy juz sume wszystkich, trzeba tylko podzielic przez liczbe obrazkow
+		UMat jedynki = UMat::ones(sizeOfImage, CV_32FC1);
+		divide(meanImageThresholded, jedynki, meanImageThresholded, 1.0 / sizeOfVector);
+
+		//musimy zamienic na nie float
+		meanImageThresholded.convertTo(meanImageThresholded, CV_8U);
+
+		vectorOfMeanThresholded.push_back(meanImageThresholded);
+
+	}
+
+
+}
+
 
 
 

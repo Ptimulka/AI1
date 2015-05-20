@@ -27,6 +27,9 @@ private:
 	std::vector<std::vector<Rect>> vectorsOfRectsFound;
 	std::vector<std::vector<Rect>> vectorsOfRectsGeneratedByJoining;
 
+	std::vector<std::vector<UMat>> vectorsOfThresholded;
+	std::vector<UMat> vectorOfMeanThresholded;
+
 	bool vectorOfImagesLoaded;
 	void createMeanImage();
 	void imagesDifference();
@@ -54,6 +57,10 @@ public:
 	//funkcja robiaca wszystko :)
 	void markCarsWithOptions(int size, int numberOfBlurs, int thresh, Scalar color);
 
+
+	void addToThresholdedWithOptions(int size, int numberOfBlurs, std::vector<int> threshes, Scalar color);
+
+	void mixThresholded();
 
 	void tryTrickWithOpenCL();
 

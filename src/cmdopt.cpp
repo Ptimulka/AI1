@@ -7,7 +7,7 @@ namespace Opts
 { 
     //zmienne z pliku .h z wartoscami domyslnymi (w naglowku tylko deklaracje)
     std::string imgs_dir = "."; //katalog z grupami zdjec (patrz main.cpp)
-    std::string imgs_groups_regexp = "default"; //interesujaca nas grupa/grupy (patrz main.cpp)
+    std::string imgs_groups_regexp = "default.*"; //interesujaca nas grupa/grupy (patrz main.cpp)
     std::string log_file = "AI.log"; //nazwa logu (patrz main.cpp)
     bool log_file_append = false; //czy dopisujemy (patrz main.cpp)
     optional<std::string> ocl_try_compile;

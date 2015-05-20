@@ -92,32 +92,43 @@ int main(int argc, char** argv)
     //Opts::imgs_dir to argument wskazujacy katalog z grupami zdjec,
     //przeszukujemy go uzywajac klasy Dir (ponownie uzywamy wstring)
     Dir imgs_dir(convert<string, wstring>(Opts::imgs_dir));
+
+	int groupNumber = 1;
+	cv::ocl::setUseOpenCL(false);
+
+
     for (Dir group : imgs_dir.getSubDirs()) //pobieramy liste podkatalog i przegladamy ja (patrz: C++ 11 range-based for)
     {
         if (!regex_match(group.name(), group_regexp)) //sprawdzamy czy nazwa podkatalogu pasuje do nazwy grupy podanej jako wyrazenie regularne (Opts::imgs_groups_regexp)
             continue; //jesli nie to pomijamy
 
         //jesli tak to pobieramy liste plikow/katalogow ktore pasuje do wyrazenie 'ref.*' (patrz obrazek referecyjny wy?ej)
-        auto refimg = group.getEntries(L"ref.*");
-        if (refimg.empty()) //nie znaleziono nic
-        {
-            sLog.log("Group ", group.path(), " doesn't have reference image in it!");
-            continue;
-        }
-        if (refimg.size() > 1) //znaleziono wiecej niz jeden
-        {
-            sLog.log("More than one reference image found in group ", group.path());
-            continue;
-        }
+		//pozwolilam to sobie zakomentowac, bo niepoczebny referencyjny :)
+        //auto refimg = group.getEntries(L"ref.*");
+        //if (refimg.empty()) //nie znaleziono nic
+        //{
+        //    sLog.log("Group ", group.path(), " doesn't have reference image in it!");
+        //    continue;
+        //}
+        //if (refimg.size() > 1) //znaleziono wiecej niz jeden
+        //{
+        //    sLog.log("More than one reference image found in group ", group.path());
+        //    continue;
+        //}
 
         //oraz ladujemy liste zdjec
+
+		//zrobilam 2 petle bo nie wiem jak zrobic lub w £ukasza regex
         vector<string> imageNames;
-        for (auto image : group.getEntries(L"zdj*"))
+        for (auto image : group.getEntries(L"MWSnap*"))
             imageNames.push_back(convert<wstring, string>(image));
+
+		for (auto image : group.getEntries(L"zdj*"))
+			imageNames.push_back(convert<wstring, string>(image));
+
 
         ImageOperations op;
 
-		cv::ocl::setUseOpenCL(true);
 
         //ktore razem z obrazkiem referencyjnym ladujemy do ImageOperations
         //op.loadReferenceImage(convert<wstring,string>(refimg.front()));	//nie ma juz tego, w ogole nie bedziemy brali od uwage obrazka referencyjnego!
@@ -156,14 +167,21 @@ int main(int argc, char** argv)
 		int czas = clock() - poczatek;
 
 		sLog.log("Tyle czasu zajelo przetwarzanie obrazkow: ", czas);
+		
 
         for (decltype(mats.size()) i = 0; i < mats.size(); i++) {
-			namedWindow(windowName + std::to_string(i), WINDOW_AUTOSIZE);
-			imshow(windowName + std::to_string(i), mats.at(i));
+			//nie pokazuje bo bajzyl sie robi na ekranie
+			//namedWindow(windowName + std::to_string(groupNumber) + "_" + std::to_string(i), WINDOW_AUTOSIZE);
+			//imshow(windowName + std::to_string(groupNumber) + "_" + std::to_string(i), mats[i]);
+
+			///ale zapisywanko
+			std::string gdzie = "./wyprod/obr" + std::to_string(groupNumber) + "_" + std::to_string(i) + ".jpg";
+			imwrite(gdzie, mats[i]);
         }
 
-        waitKey(); //without this image won't be shown
+        //waitKey(); //without this image won't be shown
 
+		groupNumber++;
         //tutaj petla sie konczy, czyli sprawdzamy nastepna grupe
     }
 
