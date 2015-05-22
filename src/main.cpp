@@ -135,7 +135,7 @@ int main(int argc, char** argv)
         
 		//jesli loadVectorOfImages zwraca NIE zero to znaczy ze blad
 		ImageOperations::ImagesErrors loaded = op.loadVectorOfImages(imageNames);
-		if (loaded) {
+		if (loaded != op.OK) {
 			//mozemy sprawdzic blad np:
 			if (loaded == ImageOperations::DIFFERENT_SIZES) {
 				sLog.log("obrazki maja rozne wymiary!\n");
@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 
 		sLog.log("Tyle czasu zajelo przetwarzanie obrazkow: ", czas);
 
-		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(30, 30);
+		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(50, 30);
 
 		//aby obczaiæ obrazki te niby gotowe na sieæ neuronow¹ trzeba daæ tu breakpointa i przejrzeæ wektor wektorów allRects!!!
 

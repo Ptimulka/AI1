@@ -308,7 +308,7 @@ std::vector<std::vector<Mat>> ImageOperations::getMatsScaledTo(int width, int he
 				Mat resized;
 				int heightAfterResize = ratio*vectorsOfRectsFound[i][j].height;
 				resize(Mat(noUMat, vectorsOfRectsFound[i][j]), resized, Size(width, heightAfterResize));
-				resized.copyTo(Mat(tmp, Rect(0, (width - heightAfterResize) / 2.0, width, heightAfterResize)));
+				resized.copyTo(Mat(tmp, Rect(0, (height - heightAfterResize) / 2.0, width, heightAfterResize)));
 			}
 
 
