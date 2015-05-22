@@ -147,19 +147,15 @@ int main(int argc, char** argv)
 		
         //z ktorymi cos potem robimy (to juz nie moje ;d)
 
-		//KOMENT MARTY: polecam na releasie, bo inczej stracicie cierpliwosc, mozecie poprobowac rozne wartosci tam nizej
-		//zeby obczaic jakie sa najlepsze
-		//mozecie tez sprobowac tam wyzej ustawic opencl na false i porownac czy jest jakas roznica w czasie u Was
-
-		//ta funkcja robi wszystko :)
-		//parametry to kolejno: rozmiar filtra rozmazujacego (NIEPARZYSTA), ile razy chcemy rozmazywac,
-		//thresh (powyzej jakiej wartosci piksel uznajemy za bialy korzystajac z funckji uznanej przez Alka za rasistowska) - zakres unsigned chara
-		//i kolor podajac b,r,g
-		//prostokaty powstale przez polaczenie dwoch zostana namalowane podobnym kolorem
-		//mozna po kolei wywolywac funkcje dla roznych parametrow i kolorow, dzieki czemu latwiej porownac :)
-		op.markCarsWithOptions(7, 3, 40, Scalar(200, 200, 0));	//turkusowy czy tez seledynowy w kazdym razie bardziej zielony
-		op.markCarsWithOptions(7, 3, 20, Scalar(200, 0, 0));	//niebieski
-		op.markCarsWithOptions(7, 3, 10, Scalar(0, 0, 200));	//czerwoniutki
+		
+		std::vector<int> threshes;
+		threshes.push_back(10);
+		threshes.push_back(20);
+		threshes.push_back(30);
+		threshes.push_back(40);
+		op.addRectsWithOptions(7, 3, threshes);
+		op.markAllPossibleCars();
+		
 
 		vector<UMat> mats = op.getLoadedImages();
 		string windowName = "window";
@@ -167,16 +163,20 @@ int main(int argc, char** argv)
 		int czas = clock() - poczatek;
 
 		sLog.log("Tyle czasu zajelo przetwarzanie obrazkow: ", czas);
-		
+
+		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(30, 30);
+
+		//aby obczaiæ obrazki te niby gotowe na sieæ neuronow¹ trzeba daæ tu breakpointa i przejrzeæ wektor wektorów allRects!!!
 
         for (decltype(mats.size()) i = 0; i < mats.size(); i++) {
 			//nie pokazuje bo bajzyl sie robi na ekranie
 			//namedWindow(windowName + std::to_string(groupNumber) + "_" + std::to_string(i), WINDOW_AUTOSIZE);
 			//imshow(windowName + std::to_string(groupNumber) + "_" + std::to_string(i), mats[i]);
 
-			///ale zapisywanko
+	
 			std::string gdzie = "./markedCars/obr" + std::to_string(groupNumber) + "_" + std::to_string(i) + ".jpg";
 			imwrite(gdzie, mats[i]);
+
         }
 
         //waitKey(); //without this image won't be shown
