@@ -62,7 +62,7 @@ public:
     inline void* createSession() const { auto* ret = initSession(); _initRunningWorkers(ret); return ret; }
     inline void* createLearningSession() { auto* ret = initSession(); _initLearningWorkers(ret); return ret; }
 
-    void learn(void* session, std::initializer_list<double> input, std::initializer_list<double> output);
+    void learn(void* session, std::initializer_list<double> input, std::initializer_list<double> output, double target_error = 0.01);
 
     void run(void* session, std::initializer_list<double> input) const;
     std::list<double> fetchResult(void* session) const;
@@ -102,7 +102,8 @@ private:
         Session(uint layers, uint nodes);
         ~Session();
 
-        vector_n<std::atomic_ullong*, 2> outputs;
+        vector_n<std::atomic_ullong*, 2> inputs;
+        vector_n<double, 2> outputs;
         vector_n<std::atomic_ullong*, 2> d;
         vector_n<double, 3> dE; //pochodne bledu po wadze, uzywane przy nauce
         vector_n<double, 3> pdE; //pochodne bledu po wadze, uzywane przy nauce
@@ -113,9 +114,10 @@ private:
 
         bool exists;
         bool run;
+        bool end;
         bool learning;
         bool can_learn;
-        std::atomic_int working;
+        std::atomic_uint working;
         std::atomic_uint waiting_counter;
 
         double learn_rate_pos;
@@ -131,4 +133,6 @@ private:
 
     void _initLearningWorkers(Session* s);
     void _initRunningWorkers(Session* s) const;
+
+    void _run(Session* s) const;
 };

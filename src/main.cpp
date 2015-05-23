@@ -10,6 +10,7 @@
 #include "utils/strutils.h"
 #include "io/dir.h"
 #include "ann/cl/oclkernel.h"
+#include "ann/fann_irprop_logical.h"
 
 using namespace cv;
 using namespace std;
@@ -63,6 +64,28 @@ int main(int argc, char** argv)
     if (Opts::ocl_try_compile.isSet())
     {
         OclKernel _tmp(Opts::ocl_try_compile);
+        sLog.close();
+        return 0;
+    }
+
+    {
+        FanniRPROP xor_test({ 2, 3, 1 });
+        auto* session = xor_test.createLearningSession();
+        xor_test.learn(session, { 0, 1 }, { 1 });
+        //xor_test.learn(session, { 0, 0 }, { 0 });
+        
+        //xor_test.learn(session, { 1, 1 }, { 0 });
+
+        auto result = xor_test.calc(session, { 1, 0 });
+        sLog.log("1^0 = ", result.back());
+        result = xor_test.calc(session, { 0, 1 });
+        sLog.log("0^1 = ", result.back());
+        result = xor_test.calc(session, { 0, 0 });
+        sLog.log("0^0 = ", result.back());
+        result = xor_test.calc(session, { 1, 1 });
+        sLog.log("1^1 = ", result.back());
+
+        xor_test.save(ofstream("xor.ann"));
         sLog.close();
         return 0;
     }

@@ -54,7 +54,7 @@ kernel void run(global float* outs, global float* w, global int layers, int n)
         barrier(CLK_GLOBAL_MEM_FENCE);
 
         //apply activation func
-        if (myneuron == 0)
+        if (prevneuron == 0)
             ACCESS_2D(outs, lid, myneuron) = 1.0/exp(-ACCESS_2D(outs, lid, myneuron));
 
         barrier(CLK_GLOBAL_MEM_FENCE);
