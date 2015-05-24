@@ -180,42 +180,70 @@ int main(int argc, char** argv)
 		op.markAllPossibleCars();
 		
 
-		vector<UMat> mats = op.getLoadedImages();
+		vector<UMat> mats = op.getLoadedImagesWithPossibleCars();
 		string windowName = "window";
 
 		int czas = clock() - poczatek;
 
 		sLog.log("Tyle czasu zajelo przetwarzanie obrazkow: ", czas);
 
-		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(50, 30);
-
-
-		//po kolei dla ka¿dego obrazka pobieramy 
-		for (decltype(allRects.size()) i = 0; i < allRects.size(); i++) {
-			for (decltype(allRects[i].size()) j = 0; j < allRects.size(); j++) {
-				std::vector<uchar> array;
-				array.assign(allRects[i][j].datastart, allRects[i][j].dataend);
-				std::vector<double> arrayOfDoubles(array.size());
-				for (decltype(array.size()) it = 0; it < array.size(); it++)
-					arrayOfDoubles[it] = array[it];			
-
-				//tu arrayOfDoubles jako wejsce sieci
-				
-			}
-		}
-
-		//aby obczaiæ obrazki te niby gotowe na sieæ neuronow¹ trzeba daæ tu breakpointa i przejrzeæ wektor wektorów allRects!!!
-
-        for (decltype(mats.size()) i = 0; i < mats.size(); i++) {
+		//obrazki z zaznaczonymi podejrzanymi miejscami
+		for (decltype(mats.size()) i = 0; i < mats.size(); i++) {
 			//nie pokazuje bo bajzyl sie robi na ekranie
 			//namedWindow(windowName + std::to_string(groupNumber) + "_" + std::to_string(i), WINDOW_AUTOSIZE);
 			//imshow(windowName + std::to_string(groupNumber) + "_" + std::to_string(i), mats[i]);
 
-	
 			std::string gdzie = "./markedCars/obr" + std::to_string(groupNumber) + "_" + std::to_string(i) + ".jpg";
 			imwrite(gdzie, mats[i]);
 
-        }
+		}
+
+
+
+		//teraz czas na ann!!!
+		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(50, 30);	//pobieramy obrazki ju¿ przystosowane na wejscie, o takim rozmiarze
+
+		//aby obczaiæ obrazki te niby gotowe na sieæ neuronow¹ trzeba daæ tu breakpointa i przejrzeæ wektor wektorów allRects!!!
+
+
+		//po kolei dla ka¿dego obrazka obczajamy 
+		for (decltype(allRects.size()) i = 0; i < allRects.size(); i++) {
+
+			for (int j = 0; j < allRects[i].size(); j++) {
+
+				std::vector<uchar> array;
+				array.assign(allRects[i][j].datastart, allRects[i][j].dataend);
+				std::vector<double> arrayOfDoubles(array.size());
+				for (decltype(array.size()) it = 0; it < array.size(); it++)
+					arrayOfDoubles[it] = array[it];
+
+				//tu arrayOfDoubles jako wejsce sieci
+
+				//odpowiedŸ sieci
+				bool annAnswer = rand() % 2;	//sieæ w skomplikowany sposób ustala czy obrazek jest samochodem ;)
+				if (annAnswer) {
+					op.setRectAsCar(i, j);
+				}
+				
+			}
+			
+		}
+
+
+		//teraz zaznczamy te juz co s¹ samochodami
+		op.markRealCars();
+
+
+		//zapisujemy
+		vector<UMat> mats2 = op.getLoadedImagesWithPossibleCars();
+		for (decltype(mats2.size()) i = 0; i < mats2.size(); i++) {
+			std::string gdzie = "./markedCarsAnn/obr" + std::to_string(groupNumber) + "_" + std::to_string(i) + ".jpg";
+			imwrite(gdzie, mats2[i]);
+		}
+
+
+
+        
 
         //waitKey(); //without this image won't be shown
 
