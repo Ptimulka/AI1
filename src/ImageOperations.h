@@ -22,15 +22,16 @@ private:
 	Size sizeOfImage;
 
 	std::vector<UMat> loadedImages;
+	std::vector<UMat> loadedImagesWithPossibleCars;
 	std::vector<UMat> loadedImagesGrayscale;
 	std::vector<UMat> imagesDifferences;
 
 	std::vector<std::vector<Rect>> vectorsOfRectsFound;
 	std::vector<std::vector<Rect>> vectorsOfRectsGeneratedByUnions;
-	std::vector<std::vector<Rect>> vectorsOfAllRects;
+	
+	std::vector<std::vector<uint>> rectsSetAsCars;
 
-	std::vector<std::vector<UMat>> vectorsOfThresholded;
-	std::vector<UMat> vectorOfMeanThresholded;
+	std::vector<std::vector<Mat>> rectsChangedForAnn;
 
 	bool vectorOfImagesLoaded;
 
@@ -61,7 +62,8 @@ public:
 	//sprawdza czy wektor obrazków jest za³adowany
 	bool isVectorOfImagesLoaded();
 	//pobranie obrazków
-	std::vector<UMat> getLoadedImages();
+	std::vector<UMat>& getLoadedImages();
+	std::vector<UMat>& getLoadedImagesWithPossibleCars();
 
 	//wykonuje na obrazku-ró¿nicy rozmazanko a potem ró¿ne treshholdy i dla ka¿dego dodaje prostok¹ty do ogólnej puli
 	void addRectsWithOptions(int size, int numberOfBlurs, std::vector<int> threshes);
@@ -69,12 +71,11 @@ public:
 	
 	//zaznacza miejsca podejrzane o bycie samochodami, te nie z unions i z unions
 	void markAllPossibleCars();
+	std::vector<std::vector<Mat>>& getMatsScaledTo(int width, int height);
+	void setRectAsCar(uint image, uint rect);
+	//to uruchamiamy po obczajeniu sieci¹ które s¹ samochodami
+	void markRealCars();
 
-	std::vector<std::vector<Mat>> getMatsScaledTo(int width, int height);
-
-
-
-	std::vector<UMat> getVectorOfMeanThresholded();
 
 	void tryTrickWithOpenCL();
 

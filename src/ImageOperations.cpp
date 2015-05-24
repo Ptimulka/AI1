@@ -17,6 +17,7 @@ ImageOperations::ImagesErrors ImageOperations::loadVectorOfImages(std::vector<st
 
 	std::vector<UMat> loadedImages;
 	std::vector<UMat> loadedImagesGrayscale;
+	std::vector<UMat> loadedImagesWithPossibleCars;
 
 	for (decltype(paths.size()) i = 0; i < paths.size(); i++) {
 		Mat next = imread(paths.at(i), IMREAD_COLOR);
@@ -24,6 +25,7 @@ ImageOperations::ImagesErrors ImageOperations::loadVectorOfImages(std::vector<st
 			vectorOfImagesLoaded = false;
 			loadedImages.clear();
 			loadedImagesGrayscale.clear();			
+			loadedImagesWithPossibleCars.clear();
 			return ImageOperations::OPENCV_ERROR;
 		}
 
@@ -33,12 +35,14 @@ ImageOperations::ImagesErrors ImageOperations::loadVectorOfImages(std::vector<st
 			vectorOfImagesLoaded = false;
 			loadedImages.clear();
 			loadedImagesGrayscale.clear();
+			loadedImagesWithPossibleCars.clear();
 			return ImageOperations::DIFFERENT_SIZES;
 		}
 
 		Mat nextGray = imread(paths.at(i), IMREAD_GRAYSCALE);
 		loadedImages.push_back(next.getUMat(ACCESS_RW));
 		loadedImagesGrayscale.push_back(nextGray.getUMat(ACCESS_RW));
+		loadedImagesWithPossibleCars.push_back(loadedImages[i].clone());
 	}
 
 	vectorOfImagesLoaded = true;
@@ -46,7 +50,7 @@ ImageOperations::ImagesErrors ImageOperations::loadVectorOfImages(std::vector<st
 	this->loadedImagesGrayscale.clear();
 	this->loadedImages = loadedImages;
 	this->loadedImagesGrayscale = loadedImagesGrayscale;
-	
+	this->loadedImagesWithPossibleCars = loadedImagesWithPossibleCars;
 
 
 	//stwarzamy od razu obrazek sredni
@@ -142,11 +146,13 @@ void ImageOperations::createMeanImage() {
 }
 
 
-std::vector<UMat> ImageOperations::getLoadedImages() {
+std::vector<UMat>& ImageOperations::getLoadedImages() {
 	return loadedImages;
 }
 
-
+std::vector<UMat>& ImageOperations::getLoadedImagesWithPossibleCars() {
+	return loadedImagesWithPossibleCars;
+}
 
 bool ImageOperations::isVectorOfImagesLoaded() {
 	return vectorOfImagesLoaded;
@@ -158,7 +164,8 @@ bool ImageOperations::isVectorOfImagesLoaded() {
 
 void ImageOperations::addRectsWithOptions(int size, int numberOfBlurs, std::vector<int> threshes) {
 
-	
+	Mat meant = meanImageGrayscale.getMat(ACCESS_READ);
+
 	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
 		UMat temp;
 		UMat temp2;
@@ -169,6 +176,8 @@ void ImageOperations::addRectsWithOptions(int size, int numberOfBlurs, std::vect
 
 		for (decltype(threshes.size()) k = 0; k < threshes.size(); k++) {
 			cv::threshold(temp, temp2, threshes[k], 255, THRESH_BINARY);	//255 = bia³y
+			Mat temp4 = temp.getMat(ACCESS_READ);
+			Mat temp3 = temp2.getMat(ACCESS_READ);
 			findContoursAddRects(temp2, vectorsOfRectsFound[i]);
 		}
 	}
@@ -183,18 +192,14 @@ void ImageOperations::markAllPossibleCars() {
 
 		deleteDuplicatesAddUnions(vectorsOfRectsFound[i], vectorsOfRectsGeneratedByUnions[i]);
 
+		Scalar color = Scalar(0, 140, 255);
 
-		Mat mat = loadedImages[i].getMat(ACCESS_RW);
+		Mat mat = loadedImagesWithPossibleCars[i].getMat(ACCESS_RW);
 		for (decltype(vectorsOfRectsFound[i].size()) j = 0; j < vectorsOfRectsFound[i].size(); j++) 
-			rectangle(mat, vectorsOfRectsFound[i][j], Scalar(rand() % 256, rand() % 256, rand() % 256));		
+			rectangle(mat, vectorsOfRectsFound[i][j], color);		
 
 		for (decltype(vectorsOfRectsGeneratedByUnions[i].size()) j = 0; j < vectorsOfRectsGeneratedByUnions[i].size(); j++) 
-			rectangle(mat, vectorsOfRectsGeneratedByUnions[i][j], Scalar(rand() % 256, rand() % 256, rand() % 256));		
-
-		//std::vector<Rect> vect;
-		//vect.reserve(vectorsOfRectsFound[i].size() + vectorsOfRectsGeneratedByUnions[i].size()); // preallocate memory
-		//vect.insert(vect.end(), vectorsOfRectsFound[i].begin(), vectorsOfRectsFound[i].end());
-		//vect.insert(vect.end(), vectorsOfRectsGeneratedByUnions[i].begin(), vectorsOfRectsGeneratedByUnions[i].end());
+			rectangle(mat, vectorsOfRectsGeneratedByUnions[i][j], color);		
 
 	}
 
@@ -280,11 +285,10 @@ void ImageOperations::deleteDuplicatesAddUnions(std::vector<Rect> &rects, std::v
 }
 
 
-std::vector<std::vector<Mat>> ImageOperations::getMatsScaledTo(int width, int height) {
+std::vector<std::vector<Mat>>& ImageOperations::getMatsScaledTo(int width, int height) {
 
-	std::vector<std::vector<Mat>> toReturn;
 
-	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
+	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {		
 
 		std::vector<Mat> toAdd;
 		Mat noUMat = loadedImagesGrayscale[i].getMat(ACCESS_READ);
@@ -298,31 +302,53 @@ std::vector<std::vector<Mat>> ImageOperations::getMatsScaledTo(int width, int he
 				//ciemne pasy po lewej i prawej
 				double ratio = (double)height / vectorsOfRectsFound[i][j].height;
 				Mat resized;
-				int widthAfterResize = ratio*vectorsOfRectsFound[i][j].width;
+				int widthAfterResize = (int)(ratio*vectorsOfRectsFound[i][j].width);
 				resize(Mat(noUMat, vectorsOfRectsFound[i][j]), resized, Size(widthAfterResize, height));
-				resized.copyTo(Mat(tmp, Rect((width - widthAfterResize) / 2.0, 0, widthAfterResize, height)));
+				resized.copyTo(Mat(tmp, Rect((int)((width - widthAfterResize) / 2.0), 0, widthAfterResize, height)));
 			}
 			else {
 
 				double ratio = (double)width / vectorsOfRectsFound[i][j].width;
 				Mat resized;
-				int heightAfterResize = ratio*vectorsOfRectsFound[i][j].height;
+				int heightAfterResize = (int)(ratio*vectorsOfRectsFound[i][j].height);
 				resize(Mat(noUMat, vectorsOfRectsFound[i][j]), resized, Size(width, heightAfterResize));
-				resized.copyTo(Mat(tmp, Rect(0, (height - heightAfterResize) / 2.0, width, heightAfterResize)));
+				resized.copyTo(Mat(tmp, Rect(0, (int)((height - heightAfterResize) / 2.0), width, heightAfterResize)));
 			}
 
 
 			toAdd.push_back(tmp);
 		}
 
-		toReturn.push_back(toAdd);
+		rectsChangedForAnn.push_back(toAdd);
 
+		//takie tam
+		std::vector < uint > temp;
+		rectsSetAsCars.push_back(temp);
 
 	}
 
-	return toReturn;
+	return rectsChangedForAnn;
 }
 
+
+void ImageOperations::setRectAsCar(uint image, uint rect) {
+	rectsSetAsCars[image].push_back(rect);
+}
+
+
+void ImageOperations::markRealCars() {
+
+	Scalar color = Scalar(0, 255, 10);
+
+	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
+		Mat mat = loadedImagesWithPossibleCars[i].getMat(ACCESS_RW);
+		
+		for (decltype(rectsSetAsCars[i].size()) j = 0; j < rectsSetAsCars[i].size(); j++) {
+			rectangle(mat, vectorsOfRectsFound[i][rectsSetAsCars[i][j]], color);
+		}
+
+	}
+}
 
 
 void ImageOperations::tryTrickWithOpenCL() {
