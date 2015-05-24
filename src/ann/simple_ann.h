@@ -9,44 +9,12 @@
 class SimpleAnn
 {
 public:
-    enum TeachingAlgorithm
-    {
-        INCREMENTAL,
-        BATCH,
-        RPROP,
-        QUICKPROP,
-        SARPROP
-    };
-
-    enum ActivationFunction
-    {
-        LINEAR,
-        THRESHOLD,
-        SIGMOID,
-        SIGMOID_STEPWISE,
-        SIGMOID_SYMMETRIC,
-        SIGMOID_SYMMETRIC_STEPWISE,
-        GAUSSIAN,
-        GAUSSIAN_SYMETRIC,
-        GAUSSIAN_STEPWISE,
-        ELLIOT,
-        ELLIOT_SYMETRIC,
-        LINEAR_PIECE,
-        LINEAR_PIECE_SYMMETRIC,
-        SIN_SYMMETRIC,
-        COS_SYMMETRIC,
-        SIN,
-        COS
-    };
-
     struct Config
     {
         uint inputs = 0;
         uint outputs = 0;
         uint layers = 0;
         uint hidden_neurons = 0;
-        TeachingAlgorithm talg = INCREMENTAL;
-        ActivationFunction afunc = LINEAR;
 
         float training_eps = 1e-6f;
 
@@ -76,6 +44,7 @@ private:
     std::shared_ptr<const Config> _myconf;
 
     struct Data;
+    Data* _mydata = nullptr;
 
     void _create();
     void _destroy();

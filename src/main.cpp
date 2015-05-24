@@ -41,6 +41,7 @@ int main(int argc, char** argv)
     catch (exception& e)
     {
         sLog.log("Error: ", e.what());
+        sLog.close();
         system("pause");
         return 1;
     }
@@ -61,6 +62,15 @@ int main(int argc, char** argv)
     else //jesli nie, to dodajemy dodatkowe wyj?cie loga do pliku
         sLog.addOutput(&out);
 
+
+    if (Opts::ann_learn) //tryb uczenia
+    {
+        sLog.close();
+        return 0;
+    }
+
+    //
+
     if (Opts::ocl_try_compile.isSet())
     {
         OclKernel _tmp(Opts::ocl_try_compile);
@@ -68,27 +78,27 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    {
-        FanniRPROP xor_test({ 2, 3, 1 });
-        auto* session = xor_test.createLearningSession();
-        xor_test.learn(session, { 0, 1 }, { 1 });
-        //xor_test.learn(session, { 0, 0 }, { 0 });
-        
-        //xor_test.learn(session, { 1, 1 }, { 0 });
+    //{
+    //    FanniRPROP xor_test({ 2, 3, 1 });
+    //    auto* session = xor_test.createLearningSession();
+    //    xor_test.learn(session, { 0, 1 }, { 1 });
+    //    //xor_test.learn(session, { 0, 0 }, { 0 });
+    //    
+    //    //xor_test.learn(session, { 1, 1 }, { 0 });
 
-        auto result = xor_test.calc(session, { 1, 0 });
-        sLog.log("1^0 = ", result.back());
-        result = xor_test.calc(session, { 0, 1 });
-        sLog.log("0^1 = ", result.back());
-        result = xor_test.calc(session, { 0, 0 });
-        sLog.log("0^0 = ", result.back());
-        result = xor_test.calc(session, { 1, 1 });
-        sLog.log("1^1 = ", result.back());
+    //    auto result = xor_test.calc(session, { 1, 0 });
+    //    sLog.log("1^0 = ", result.back());
+    //    result = xor_test.calc(session, { 0, 1 });
+    //    sLog.log("0^1 = ", result.back());
+    //    result = xor_test.calc(session, { 0, 0 });
+    //    sLog.log("0^0 = ", result.back());
+    //    result = xor_test.calc(session, { 1, 1 });
+    //    sLog.log("1^1 = ", result.back());
 
-        xor_test.save(ofstream("xor.ann"));
-        sLog.close();
-        return 0;
-    }
+    //    xor_test.save(ofstream("xor.ann"));
+    //    sLog.close();
+    //    return 0;
+    //}
 
     //s?ów kilka a propos ?adowania obrazków,
     // obrazki dzielimy na grupy/paczki/itd. idea jest taka, zeby kazda taka paczka
@@ -141,14 +151,9 @@ int main(int argc, char** argv)
 
         //oraz ladujemy liste zdjec
 
-		//zrobilam 2 petle bo nie wiem jak zrobic lub w £ukasza regex
         vector<string> imageNames;
-        for (auto image : group.getEntries(L"MWSnap*"))
+        for (auto image : group.getEntries(L"(MWSnap|zdj).*"))
             imageNames.push_back(convert<wstring, string>(image));
-
-		for (auto image : group.getEntries(L"zdj*"))
-			imageNames.push_back(convert<wstring, string>(image));
-
 
         ImageOperations op;
 

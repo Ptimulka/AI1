@@ -1,4 +1,5 @@
 #include "dir.h"
+#include <regex>
 #include <algorithm>
 using namespace std;
 
@@ -40,7 +41,8 @@ FilesList Dir::getEntries(wstring const& regexp, ListingFlags listing_options) c
     if (myself.empty())
         return FilesList();
 
-    auto path = (myself + regexp);
+    auto path = (myself + L"*");
+    wregex _regexp(regexp == L"*" ? L".*" : regexp);
 
     WIN32_FIND_DATAW found_file;
     HANDLE search = FindFirstFileW((LPCWSTR)path.data(), &found_file);
@@ -74,6 +76,9 @@ FilesList Dir::getEntries(wstring const& regexp, ListingFlags listing_options) c
             continue;
 
         name = move(wstring(&found_file.cFileName[0], lstrlenW(found_file.cFileName)));
+        if (!regex_match(name, _regexp))
+            continue;
+
         ret.push_back(myself + name);
     } while (FindNextFileW(search, &found_file));
 

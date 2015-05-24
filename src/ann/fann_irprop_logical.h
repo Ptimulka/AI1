@@ -112,13 +112,17 @@ private:
 
         std::vector<std::thread*> workers;
 
-        bool exists;
-        bool run;
-        bool end;
+        std::atomic<bool> exists;
+        std::atomic<bool> run;
+        std::atomic<bool> end;
         bool learning;
         bool can_learn;
         std::atomic_uint working;
-        std::atomic_uint waiting_counter;
+
+        std::atomic_uint barrier1;
+        std::atomic_uint barrier2;
+        std::atomic_uint barrier3;
+        std::atomic_uint barrier4;
 
         double learn_rate_pos;
         double learn_rate_neg;

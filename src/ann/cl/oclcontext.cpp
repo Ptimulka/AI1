@@ -19,7 +19,7 @@ OclContext::OclContext() : OclContext(*OclMgr::singleton().getComputeDevice())
 OclContext::OclContext(OclDevice create_on_device) : device(create_on_device)
 {
     void* dptrs[] = { device.getNativeHandler() };
-    init(device.getPlatform()->getNativeHandler(), dptrs, 1);
+    init(device.getPlatform()->getNativeHandler(), dptrs, sizeof(dptrs)/sizeof(void*));
 }
 
 OclContext::~OclContext()
@@ -30,6 +30,24 @@ OclContext::~OclContext()
 void* OclContext::getNativeHandler() const
 {
     return d->context;
+}
+
+void * OclContext::createBuffer(BufferMode mode, size_t size, void* src)
+{
+    cl_mem_flags memf = (src == nullptr ? 0 : CL_MEM_COPY_HOST_PTR | CL_MEM_ALLOC_HOST_PTR);
+    if (mode == READ)
+        memf |= CL_MEM_READ_ONLY;
+    else if (mode == WRITE)
+        memf |= CL_MEM_WRITE_ONLY;
+    else
+        memf |= CL_MEM_READ_WRITE;
+
+    cl_int error;
+    void* ret = clCreateBuffer(d->context, memf, size, nullptr, &error);
+    if (error != CL_SUCCESS)
+        sLog.log("error while creating ocl buffer object: ", error);
+
+    return ret;
 }
 
 void OclContext::init(void* pptr, void** dptrs, unsigned int dptrs_count)

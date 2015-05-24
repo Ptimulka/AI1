@@ -1,15 +1,18 @@
 #include "fann_irprop_logical.h"
 #include <cassert>
 #include <algorithm>
+#include "utils/log.h"
 using namespace std;
 
 const double& as_double(unsigned long long const& mem)
 {
+    static_assert(sizeof(double) == sizeof(unsigned long long), "");
     return *(const double* const)&mem;
 }
 
 double& as_double(unsigned long long& mem)
 {
+    static_assert(sizeof(double) == sizeof(unsigned long long), "");
     return *(double* const)&mem;
 }
 
@@ -33,21 +36,6 @@ void atomic_double_add(atomic_ullong& mem, double value_to_add)
         expected = as_double(mem.load());
         sum = expected + value_to_add;
     } while (mem.compare_exchange_strong(as_ull(expected), as_ull(sum)) == false);
-}
-
-void wait_for_count(atomic_uint& counter, unsigned count, uint prev_count)
-{
-    while (counter.load() >= min(prev_count + 1, count))
-        ;// this_thread::sleep_for(chrono::milliseconds(1));
-
-    auto waiting = counter.fetch_add(1) + 1;
-    if (waiting < count)
-        while (counter < count)
-            ;// this_thread::sleep_for(chrono::milliseconds(1));
-
-    waiting = counter.fetch_add(1) + 1;
-    if (waiting == count * 2)
-        counter = 0;
 }
 
 int sign(double f)
@@ -131,16 +119,16 @@ void FanniRPROP::run(void * session, std::initializer_list<double> input) const
 
 void FanniRPROP::_run(Session * s) const
 {
-    while (s->waiting_counter != 0)
-        ;//this_thread::sleep_for(chrono::milliseconds(1));
-
+    //sLog.log("Starting network");
     s->run = true;
-    s->end = false;
     while (!s->end /*|| s->waiting_counter.load() < s->workers.size()*/)
         ;//this_thread::sleep_for(chrono::milliseconds(1));
 
+    //sLog.log("End reached");
     s->run = false;
-    wait_for_count(s->waiting_counter, s->workers.size() + 1, s->workers.size());
+    s->end = false;
+    while (s->working.load() > 0)
+        ;
 }
 
 std::list<double> FanniRPROP::fetchResult(void* session) const
@@ -242,13 +230,18 @@ void FanniRPROP::createNewNet(initializer_list<uint> const& layers)
 FanniRPROP::Session* FanniRPROP::initSession() const
 {
     Session* new_session = new Session(net.size(), max_nodes);
-    new_session->exists = true;
-    new_session->run = false;
-    new_session->end = false;
+    atomic_init(&new_session->exists, true);
+    atomic_init(&new_session->run, false);
+    atomic_init(&new_session->end, false);
+
     new_session->learning = false;
     new_session->can_learn = false;
     atomic_init(&new_session->working, 0);
-    atomic_init(&new_session->waiting_counter, 0);
+    
+    atomic_init(&new_session->barrier1, 0);
+    atomic_init(&new_session->barrier2, 0);
+    atomic_init(&new_session->barrier3, 0);
+    atomic_init(&new_session->barrier4, 0);
 
     new_session->learn_rate_pos = 0.8;
     new_session->learn_rate_neg = 1.2;
@@ -279,6 +272,16 @@ FanniRPROP::Session* FanniRPROP::initSession() const
     return new_session;
 }
 
+#define BARRIER(n) do { \
+    auto waiting = new_session->barrier##n.fetch_add(1) + 1; \
+    if (waiting < new_session->workers.size()) \
+        while (new_session->barrier##n < new_session->workers.size()) \
+            ; \
+    waiting = new_session->barrier##n.fetch_add(1) + 1; \
+    if (waiting == new_session->workers.size() * 2) \
+        new_session->barrier##n = 0; \
+} while (false)
+
 void FanniRPROP::_initLearningWorkers(Session* new_session)
 {
     new_session->can_learn = true;
@@ -288,7 +291,7 @@ void FanniRPROP::_initLearningWorkers(Session* new_session)
         tptr = new thread([new_session, this](const uint myneuron, const uint prevneuron) {
             while (new_session->exists)
             {
-                while ((!new_session->run || new_session->end || new_session->working > new_session->workers.size()) && new_session->exists)
+                while ((!new_session->run || new_session->end) && new_session->exists)
                     ;/*this_thread::sleep_for(chrono::milliseconds(1));*/
 
                 if (!new_session->exists)
@@ -300,7 +303,7 @@ void FanniRPROP::_initLearningWorkers(Session* new_session)
                     if (prevneuron == 0)
                         new_session->inputs[i][myneuron]->store(0);
 
-                    wait_for_count(new_session->waiting_counter, new_session->workers.size(), new_session->workers.size() + 1);
+                    BARRIER(1);
 
                     if (net[i].nodes.size() > myneuron && net[i - 1].nodes.size() > prevneuron)
                     {
@@ -308,7 +311,7 @@ void FanniRPROP::_initLearningWorkers(Session* new_session)
                         atomic_double_add(*new_session->inputs[i][myneuron], tmp);
                     }
 
-                    wait_for_count(new_session->waiting_counter, new_session->workers.size(), new_session->workers.size());
+                    BARRIER(2);
 
                     if (prevneuron == 0)
                     {
@@ -317,7 +320,7 @@ void FanniRPROP::_initLearningWorkers(Session* new_session)
                         new_session->outputs[i][myneuron] = val;
                     }
 
-                    wait_for_count(new_session->waiting_counter, new_session->workers.size(), new_session->workers.size());
+                    BARRIER(3);
                 }
 
                 if (new_session->learning)
@@ -327,7 +330,7 @@ void FanniRPROP::_initLearningWorkers(Session* new_session)
                     if (nextneuron == 0)
                         new_session->d.back()[myneuron]->store(as_ull((new_session->outputs.back()[myneuron] - new_session->expected[myneuron]) * new_session->outputs.back()[myneuron] * (1 - new_session->outputs.back()[myneuron])));
 
-                    wait_for_count(new_session->waiting_counter, new_session->workers.size(), new_session->workers.size());
+                    BARRIER(2);
 
                     for (int lid = net.size() - 2; lid > 0; --lid)
                     {
@@ -336,7 +339,10 @@ void FanniRPROP::_initLearningWorkers(Session* new_session)
                             double tmp = as_double(new_session->d[lid + 1][nextneuron]->load()) * net[lid + 1].nodes[nextneuron].in_weights[myneuron]*new_session->outputs[lid][myneuron] * (1 - new_session->outputs[lid][myneuron]);
                             atomic_double_add(*new_session->d[lid][myneuron], tmp);
                         }
-                        wait_for_count(new_session->waiting_counter, new_session->workers.size(), new_session->workers.size());
+                        if (lid & 0x01)
+                            BARRIER(1);
+                        else
+                            BARRIER(2);
                     }
 
                     for (uint lid = 1; lid<net.size(); ++lid)
@@ -373,17 +379,24 @@ void FanniRPROP::_initLearningWorkers(Session* new_session)
                             }
                         }
 
-                        wait_for_count(new_session->waiting_counter, new_session->workers.size(), new_session->workers.size());
+                        if (lid & 0x01)
+                            BARRIER(2);
+                        else
+                            BARRIER(3);
                     }
 
                 }
 
+                //sLog.log("Case done");
+
                 if (new_session->working.fetch_add(1) +1 == new_session->workers.size() * 2)
                 {
                     new_session->end = true;
+                    while (new_session->run)
+                        ;
                     new_session->working = 0;
                 }
-                wait_for_count(new_session->waiting_counter, new_session->workers.size() + 1, new_session->workers.size());
+                BARRIER(4);
 
             }
         }, wid / max_nodes, wid%max_nodes);
@@ -412,7 +425,7 @@ void FanniRPROP::_initRunningWorkers(Session* new_session) const
                     double tmp = new_session->outputs[i - 1][prevneuron];
                     atomic_double_add(*new_session->inputs[i][myneuron], tmp);
 
-                    wait_for_count(new_session->waiting_counter, new_session->workers.size(), new_session->workers.size() + 1);
+                    BARRIER(1);
 
                     if (prevneuron == 0)
                     {
@@ -421,7 +434,7 @@ void FanniRPROP::_initRunningWorkers(Session* new_session) const
                         new_session->outputs[i][myneuron] = val;
                     }
 
-                    wait_for_count(new_session->waiting_counter, new_session->workers.size(), new_session->workers.size());
+                    BARRIER(2);
                 }
 
                 if (new_session->working.fetch_add(1) + 1 == new_session->workers.size() * 2)
@@ -429,7 +442,7 @@ void FanniRPROP::_initRunningWorkers(Session* new_session) const
                     new_session->end = true;
                     new_session->working = 0;
                 }
-                wait_for_count(new_session->waiting_counter, new_session->workers.size() + 1, new_session->workers.size());
+                BARRIER(1);
 
             }
         }, wid / max_nodes, wid%max_nodes);

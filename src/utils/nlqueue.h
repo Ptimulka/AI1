@@ -11,6 +11,7 @@ class NlQueue
 public:
     NlQueue()
     {
+        std::atomic_init(&guard, new Node());
         std::atomic_init(&head, guard);
     }
 
@@ -48,12 +49,19 @@ public:
     std::list<T> fetchAll()
     {
         decltype(fetchAll()) ret;
-        auto first = head.exchange(guard);
-        if (first == guard)
+        auto last = guard.load();
+        auto first = head.exchange(last);
+
+        if (first == last)
             return ret;
 
-        while (first->value != nullptr)
+        while (first != last)
         {
+            if (first->value == nullptr)
+            {
+                head.compare_exchange_strong(last, first);
+                break;
+            }
             ret.push_back(*first->value);
             auto tmp = first;
             first = tmp->next;
@@ -79,15 +87,15 @@ private:
     };
 
     std::atomic<Node*> head;
-    Node* guard = new Node();
+    std::atomic<Node*> guard;
 
     void _push(Node* n)
     {
-        guard->next = n;
         auto tmp = n->value;
         n->value = nullptr;
-        guard->value = tmp;
-        guard = n;
+        auto last = guard.exchange(n);
+        last->next = n;
+        last->value = tmp;
     }
 
     T _pop()
@@ -108,5 +116,6 @@ private:
         return ret;
     }
 };
+
 
 #endif //SHARED_NON_LOCKING_QUEUE_H

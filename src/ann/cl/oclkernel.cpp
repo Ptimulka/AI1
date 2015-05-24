@@ -58,7 +58,7 @@ OclKernel::OclKernel(string const& path, OclContext* context) : mypath(path)
     }
     else
     {
-        sLog.log("kernel '", mypath, "' has compiled successfully.\n");
+        sLog.log("kernel '", mypath, "' has compiled successfully on device ", context->getDevice().getName(), ".\n");
         build_success = true;
     }
 }
@@ -66,5 +66,30 @@ OclKernel::OclKernel(string const& path, OclContext* context) : mypath(path)
 OclKernel::~OclKernel()
 {
     clReleaseProgram((cl_program)myprogram);
+}
+
+struct OclKernel::Instance
+{
+    cl_kernel kernel;
+    cl_uint args;
+};
+
+OclKernel::Instance* OclKernel::_createNewKernel(std::string const& kernelname)
+{
+    Instance* ret = new Instance;
+    cl_int error;
+    ret->kernel = clCreateKernel((cl_program)myprogram, kernelname.c_str(), &error);
+    if (error != CL_SUCCESS)
+    {
+        sLog.log("error while creating new callable kernel instance: ", error);
+        ret->kernel = nullptr;
+    }
+    ret->args = 0;
+    return ret;
+}
+
+void OclKernel::_pushArg(Instance * i, const char * ptr, size_t size)
+{
+    clSetKernelArg(i->kernel, i->args++, size, ptr);
 }
 

@@ -1,5 +1,11 @@
 #include "simple_ann.h"
+#include "fann.h"
 using namespace std;
+
+struct SimpleAnn::Data
+{
+    fann* ann;
+};
 
 SimpleAnn::SimpleAnn(const Config * anncfg) : SimpleAnn(shared_ptr<const SimpleAnn::Config>(new Config(*anncfg)))
 {
@@ -19,12 +25,29 @@ SimpleAnn::~SimpleAnn()
     _destroy();
 }
 
+void SimpleAnn::train(std::vector<float> data, std::vector<float> output)
+{
+
+}
+
 void SimpleAnn::_create()
 {
+    _mydata = new Data;
+
+    vector<uint> layers;
+    layers.push_back(_myconf->inputs);
+    for (uint i = 0; i < _myconf->layers - 2; ++i)
+        layers.push_back(_myconf->hidden_neurons);
+    layers.push_back(_myconf->outputs);
+    //_mydata->ann = fann_create_standard(_myconf->layers, *layers.data());
 }
 
 void SimpleAnn::_destroy()
 {
+    //fann_destroy(_mydata->ann);
+    _mydata->ann = nullptr;
+    delete _mydata;
+    _mydata = nullptr;
 }
 
 void SimpleAnn::Config::save(ostream & out)

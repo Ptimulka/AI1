@@ -19,9 +19,34 @@ public:
 
     inline bool buildSuccessfully() const { return build_success; }
 
+    struct Instance;
+
+    template <typename... ARGS>
+    Instance* getCallableInstance(std::string kernelName, ARGS... a)
+    {
+        Instance* i = _createNewKernel(kernelName);
+        _pushArgs(i, a...);
+        return i;
+    }
+
 private:
     std::string mypath;
     bool build_success = false;
 
     void* myprogram = nullptr;
+
+    OclKernel::Instance * _createNewKernel(std::string const & kernelname);
+
+    template <typename... ARGS>
+    void _pushArgs(Instance* i, ARGS... a)
+    {
+        return;
+    }
+    template <typename ARG, typename... REST>
+    void _pushArgs(Instance* i, ARG a, REST... rest)
+    {
+        _pushArg(i, (const char*)&a, sizeof(a));
+        _pushArgs(i, rest...);
+    }
+    void _pushArg(Instance* i, const char* ptr, size_t size);
 };
