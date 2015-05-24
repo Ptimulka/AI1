@@ -27,7 +27,9 @@ private:
 
 	std::vector<std::vector<Rect>> vectorsOfRectsFound;
 	std::vector<std::vector<Rect>> vectorsOfRectsGeneratedByUnions;
-	std::vector<std::vector<Rect>> vectorsOfAllRects;
+	
+
+	std::vector<std::vector<Mat>> rectsChangedForAnn;
 
 	std::vector<std::vector<UMat>> vectorsOfThresholded;
 	std::vector<UMat> vectorOfMeanThresholded;

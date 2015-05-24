@@ -158,7 +158,8 @@ bool ImageOperations::isVectorOfImagesLoaded() {
 
 void ImageOperations::addRectsWithOptions(int size, int numberOfBlurs, std::vector<int> threshes) {
 
-	
+	Mat meant = meanImageGrayscale.getMat(ACCESS_READ);
+
 	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
 		UMat temp;
 		UMat temp2;
@@ -169,6 +170,8 @@ void ImageOperations::addRectsWithOptions(int size, int numberOfBlurs, std::vect
 
 		for (decltype(threshes.size()) k = 0; k < threshes.size(); k++) {
 			cv::threshold(temp, temp2, threshes[k], 255, THRESH_BINARY);	//255 = bia³y
+			Mat temp4 = temp.getMat(ACCESS_READ);
+			Mat temp3 = temp2.getMat(ACCESS_READ);
 			findContoursAddRects(temp2, vectorsOfRectsFound[i]);
 		}
 	}
@@ -282,7 +285,6 @@ void ImageOperations::deleteDuplicatesAddUnions(std::vector<Rect> &rects, std::v
 
 std::vector<std::vector<Mat>> ImageOperations::getMatsScaledTo(int width, int height) {
 
-	std::vector<std::vector<Mat>> toReturn;
 
 	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
 
@@ -298,29 +300,29 @@ std::vector<std::vector<Mat>> ImageOperations::getMatsScaledTo(int width, int he
 				//ciemne pasy po lewej i prawej
 				double ratio = (double)height / vectorsOfRectsFound[i][j].height;
 				Mat resized;
-				int widthAfterResize = ratio*vectorsOfRectsFound[i][j].width;
+				int widthAfterResize = (int)(ratio*vectorsOfRectsFound[i][j].width);
 				resize(Mat(noUMat, vectorsOfRectsFound[i][j]), resized, Size(widthAfterResize, height));
-				resized.copyTo(Mat(tmp, Rect((width - widthAfterResize) / 2.0, 0, widthAfterResize, height)));
+				resized.copyTo(Mat(tmp, Rect((int)((width - widthAfterResize) / 2.0), 0, widthAfterResize, height)));
 			}
 			else {
 
 				double ratio = (double)width / vectorsOfRectsFound[i][j].width;
 				Mat resized;
-				int heightAfterResize = ratio*vectorsOfRectsFound[i][j].height;
+				int heightAfterResize = (int)(ratio*vectorsOfRectsFound[i][j].height);
 				resize(Mat(noUMat, vectorsOfRectsFound[i][j]), resized, Size(width, heightAfterResize));
-				resized.copyTo(Mat(tmp, Rect(0, (height - heightAfterResize) / 2.0, width, heightAfterResize)));
+				resized.copyTo(Mat(tmp, Rect(0, (int)((height - heightAfterResize) / 2.0), width, heightAfterResize)));
 			}
 
 
 			toAdd.push_back(tmp);
 		}
 
-		toReturn.push_back(toAdd);
+		rectsChangedForAnn.push_back(toAdd);
 
 
 	}
 
-	return toReturn;
+	return rectsChangedForAnn;
 }
 
 
