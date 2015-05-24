@@ -69,25 +69,25 @@ int main(int argc, char** argv)
     }
 
     {
-        FanniRPROP xor_test({ 2, 3, 1 });
-        auto* session = xor_test.createLearningSession();
-        xor_test.learn(session, { 0, 1 }, { 1 });
-        //xor_test.learn(session, { 0, 0 }, { 0 });
-        
-        //xor_test.learn(session, { 1, 1 }, { 0 });
+        //FanniRPROP xor_test({ 2, 3, 1 });
+        //auto* session = xor_test.createLearningSession();
+        //xor_test.learn(session, { 0, 1 }, { 1 });
+        ////xor_test.learn(session, { 0, 0 }, { 0 });
+        //
+        ////xor_test.learn(session, { 1, 1 }, { 0 });
 
-        auto result = xor_test.calc(session, { 1, 0 });
-        sLog.log("1^0 = ", result.back());
-        result = xor_test.calc(session, { 0, 1 });
-        sLog.log("0^1 = ", result.back());
-        result = xor_test.calc(session, { 0, 0 });
-        sLog.log("0^0 = ", result.back());
-        result = xor_test.calc(session, { 1, 1 });
-        sLog.log("1^1 = ", result.back());
+        //auto result = xor_test.calc(session, { 1, 0 });
+        //sLog.log("1^0 = ", result.back());
+        //result = xor_test.calc(session, { 0, 1 });
+        //sLog.log("0^1 = ", result.back());
+        //result = xor_test.calc(session, { 0, 0 });
+        //sLog.log("0^0 = ", result.back());
+        //result = xor_test.calc(session, { 1, 1 });
+        //sLog.log("1^1 = ", result.back());
 
-        xor_test.save(ofstream("xor.ann"));
-        sLog.close();
-        return 0;
+        //xor_test.save(ofstream("xor.ann"));
+        //sLog.close();
+        //return 0;
     }
 
     //s?ów kilka a propos ?adowania obrazków,
@@ -188,6 +188,21 @@ int main(int argc, char** argv)
 		sLog.log("Tyle czasu zajelo przetwarzanie obrazkow: ", czas);
 
 		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(50, 30);
+
+
+		//po kolei dla ka¿dego obrazka pobieramy 
+		for (decltype(allRects.size()) i = 0; i < allRects.size(); i++) {
+			for (decltype(allRects[i].size()) j = 0; j < allRects.size(); j++) {
+				std::vector<uchar> array;
+				array.assign(allRects[i][j].datastart, allRects[i][j].dataend);
+				std::vector<double> arrayOfDoubles(array.size());
+				for (decltype(array.size()) it = 0; it < array.size(); it++)
+					arrayOfDoubles[it] = array[it];			
+
+				//tu arrayOfDoubles jako wejsce sieci
+				
+			}
+		}
 
 		//aby obczaiæ obrazki te niby gotowe na sieæ neuronow¹ trzeba daæ tu breakpointa i przejrzeæ wektor wektorów allRects!!!
 
