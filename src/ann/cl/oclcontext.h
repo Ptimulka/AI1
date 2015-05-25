@@ -1,7 +1,9 @@
 #pragma once
 
 #include "ocldevice.h"
+#include <cstddef>
 #include <tuple>
+#include <cstdlib>
 
 class OclContext
 {
@@ -42,11 +44,11 @@ private:
     template <typename... _TS>
     struct _bytes_counter
     {
-        static constexpr size_t count = 0;
+        static const std::size_t count = 0;
     };
     template <typename _T, typename... _REST>
     struct _bytes_counter<_T, _REST...>
     {
-        static constexpr size_t count = sizeof(_T) + _bytes_counter<_REST...>::count;
+        static const std::size_t count = sizeof(_T) + _bytes_counter<_REST...>::count;
     };
 };
