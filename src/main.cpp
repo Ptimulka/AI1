@@ -95,7 +95,10 @@ int main(int argc, char** argv)
 
 	///////------UCZENIE SIECIUNI!!!!---------\\\\\\\\
 
+
 	if (Opts::ann_learn) {
+
+		Dir imgs_dir(convert<string, wstring>("fotyUczace"));
 
 		std::vector<string> paths; 
 		//jeszcze trzeba sk¹dœ wzi¹æ odpowiedzi!
