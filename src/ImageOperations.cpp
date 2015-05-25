@@ -73,6 +73,58 @@ ImageOperations::ImagesErrors ImageOperations::loadVectorOfImages(std::vector<st
 }
 
 
+ImageOperations::ImagesErrors ImageOperations::loadVectorOfImagesToLearn(std::vector<std::string> paths) {
+
+	if (paths.size() == 0)
+		return ImageOperations::NO_PATH;
+
+	for (decltype(paths.size()) i = 0; i < paths.size(); i++) {
+		Mat next = imread(paths.at(i), IMREAD_GRAYSCALE);
+		if (next.data == NULL) {
+			return ImageOperations::OPENCV_ERROR;
+		}
+		
+		learningImages.push_back(next);
+	}
+
+	return OK;
+}
+
+
+
+std::vector<Mat>& ImageOperations::getLearningImagesScaledTo(int width, int height) {
+
+	for (decltype(learningImages.size()) j = 0; j < learningImages.size(); j++) {
+
+		Mat tmp = Mat(height, width, CV_8U);
+		tmp = cv::Scalar(128);	//taki szary pomiedzy czarnym i bia³ym ;)
+
+		if ((double)learningImages[j].rows / learningImages[j].cols >(double)height / width) {
+			//ciemne pasy po lewej i prawej
+			double ratio = (double)height / learningImages[j].rows;
+			Mat resized;
+			int widthAfterResize = (int)(ratio*learningImages[j].cols);
+			resize(learningImages[j], resized, Size(widthAfterResize, height));
+			resized.copyTo(Mat(tmp, Rect((int)((width - widthAfterResize) / 2.0), 0, widthAfterResize, height)));
+		}
+		else {
+
+			double ratio = (double)width / learningImages[j].cols;
+			Mat resized;
+			int heightAfterResize = (int)(ratio*learningImages[j].rows);
+			resize(learningImages[j], resized, Size(width, heightAfterResize));
+			resized.copyTo(Mat(tmp, Rect(0, (int)((height - heightAfterResize) / 2.0), width, heightAfterResize)));
+		}
+
+		learningImages[j] = tmp;
+
+	}
+
+	return learningImages;
+
+}
+
+
 
 void ImageOperations::createMeanImage() {
 
@@ -350,35 +402,6 @@ void ImageOperations::markRealCars() {
 	}
 }
 
-
-void ImageOperations::tryTrickWithOpenCL() {
-
-	if (!cv::ocl::haveOpenCL())
-	{
-		std::cout << "OpenCL is not avaiable..." << std::endl;
-		return;
-	}
-	cv::ocl::Context context;
-	if (!context.create(cv::ocl::Device::TYPE_ALL))
-	{
-		std::cout << "Failed creating the context..." << std::endl;
-		return;
-	}
-
-	// In OpenCV 3.0.0 beta, only a single device is detected.
-	std::cout << context.ndevices() << " GPU devices are detected." << std::endl;
-	for (int i = 0; i < context.ndevices(); i++)
-	{
-		cv::ocl::Device device = context.device(i);
-		std::cout << "name                 : " << device.name() << std::endl;
-		std::cout << "available            : " << device.type() << std::endl;
-		std::cout << "imageSupport         : " << device.imageSupport() << std::endl;
-		std::cout << "OpenCL_C_Version     : " << device.OpenCL_C_Version() << std::endl;
-		std::cout << std::endl;
-	}
-
-	return;
-}
 
 
 

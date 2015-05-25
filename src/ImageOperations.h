@@ -43,6 +43,10 @@ private:
 	void deleteDuplicatesAddUnions(std::vector<Rect> &rects, std::vector<Rect> &rectsUnions);
 
 
+	//do uczenia sieci
+	std::vector<Mat> learningImages;
+	
+
 
 
 public:
@@ -76,9 +80,8 @@ public:
 	//to uruchamiamy po obczajeniu sieci¹ które s¹ samochodami
 	void markRealCars();
 
-
-	void tryTrickWithOpenCL();
-
+	ImagesErrors loadVectorOfImagesToLearn(std::vector<std::string> paths);
+	std::vector<Mat>& getLearningImagesScaledTo(int width, int height);
 
 };
 

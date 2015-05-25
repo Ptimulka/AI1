@@ -92,6 +92,44 @@ int main(int argc, char** argv)
         //return 0;
     }
 
+
+	///////------UCZENIE SIECIUNI!!!!---------\\\\\\\\
+
+	if (Opts::ann_learn) {
+
+		std::vector<string> paths; 
+		//jeszcze trzeba sk¹dœ wzi¹æ odpowiedzi!
+
+		ImageOperations op;
+		op.loadVectorOfImagesToLearn(paths);
+
+		std::vector<Mat> scaledImages = op.getLearningImagesScaledTo(36, 28);	//szerokosæ, wysokoœæ
+
+		for (decltype(scaledImages.size()) i = 0; i < scaledImages.size(); i++) {
+			std::vector<uchar> array;
+			array.assign(scaledImages[i].datastart, scaledImages[i].dataend);
+			std::vector<double> arrayOfDoubles(array.size());
+			for (decltype(array.size()) it = 0; it < array.size(); it++)
+				arrayOfDoubles[it] = array[it];
+
+			//tu uczenie sieci
+
+			
+		}
+
+
+
+
+		return 0;
+	}
+
+
+
+
+	///////------TUTAJ NIE UCZENIE SIECIUNI!!!!---------\\\\\\\\
+
+
+
     //s?ów kilka a propos ?adowania obrazków,
     // obrazki dzielimy na grupy/paczki/itd. idea jest taka, zeby kazda taka paczka
     // stanowila osobny przypadek - np. osobne skrzyzowanie
