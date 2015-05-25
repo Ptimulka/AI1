@@ -99,9 +99,12 @@ int main(int argc, char** argv)
 	if (Opts::ann_learn) {
 
 		Dir imgs_dir(convert<string, wstring>("fotyUczace"));
+		std::vector<string> paths;
 
-		std::vector<string> paths; 
-		//jeszcze trzeba sk¹dœ wzi¹æ odpowiedzi!
+		for (auto image : imgs_dir.getEntries(L"pos.*"))
+			paths.push_back(convert<wstring, string>(image));
+
+		//teraz opcja dla pozytywnych obrazków!
 
 		ImageOperations op;
 		op.loadVectorOfImagesToLearn(paths);
