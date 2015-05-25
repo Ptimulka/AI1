@@ -75,6 +75,8 @@ ImageOperations::ImagesErrors ImageOperations::loadVectorOfImages(std::vector<st
 
 ImageOperations::ImagesErrors ImageOperations::loadVectorOfImagesToLearn(std::vector<std::string> paths) {
 
+	learningImages.clear();
+
 	if (paths.size() == 0)
 		return ImageOperations::NO_PATH;
 
