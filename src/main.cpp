@@ -85,22 +85,45 @@ int main(int argc, char** argv)
         }
 
 		Dir imgs_dir(convert<string, wstring>("fotyUczace"));
-		std::vector<string> paths;
+		std::vector<string> pathsPos;
+		std::vector<string> pathsNeg;
 
 		for (auto image : imgs_dir.getEntries(L"pos.*"))
-			paths.push_back(convert<wstring, string>(image));
+			pathsPos.push_back(convert<wstring, string>(image));
 
-		//teraz opcja dla pozytywnych obrazków!
+		for (auto image : imgs_dir.getEntries(L"neg.*"))
+			pathsNeg.push_back(convert<wstring, string>(image));
+
+
+		
 
 		ImageOperations op;
-		op.loadVectorOfImagesToLearn(paths);
 
+		//najpierw pozytywne
+		op.loadVectorOfImagesToLearn(pathsPos);
 		std::vector<Mat> scaledImages = op.getLearningImagesScaledTo(36, 28);	//szerokosæ, wysokoœæ
 
         std::vector<double> array;
         array.reserve(Opts::ann_learn_chunk_size);
+		
+		//todo pos
 
-        ArtificialNeuralNetwork ann(Opts::ann_learn_new.isSet() ? vector<uint>{ 36 * 28, 36 * 7, 36, 36 * 2, 1 } : Opts::)
+		//a tera negatywne
+		op.loadVectorOfImagesToLearn(pathsNeg);
+		scaledImages = op.getLearningImagesScaledTo(36, 28);
+
+
+		//to samo co dla pos
+		for (decltype(scaledImages.size()) i = 0; i < scaledImages.size(); i++) {
+			std::vector<uchar> array;
+			array.assign(scaledImages[i].datastart, scaledImages[i].dataend);
+			std::vector<double> arrayOfDoubles(array.size());
+			for (decltype(array.size()) it = 0; it < array.size(); it++)
+				arrayOfDoubles[it] = array[it];
+
+			//tu uczenie sieci
+
+		}
 
 		for (decltype(scaledImages.size()) i = 0; i < scaledImages.size(); )
         {
