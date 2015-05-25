@@ -84,6 +84,9 @@
     <ClCompile Include="..\..\src\ann\fann_irprop_logical.cpp">
       <Filter>Source Files\ann</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ann\ann.cpp">
+      <Filter>Source Files\ann</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\utils\cmdline.h">
@@ -145,6 +148,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\ann\fann_irprop_logical.h">
       <Filter>Source Files\ann</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ann\ann.h">
+      <Filter>Header Files\ann</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utils\vectorn.h">
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

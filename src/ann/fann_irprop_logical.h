@@ -1,6 +1,7 @@
 #pragma once
 
 #include "typedefs.h"
+#include "utils/vectorn.h"
 #include <list>
 #include <vector>
 #include <atomic>
@@ -8,49 +9,6 @@
 #include <iostream>
 #include <initializer_list>
 
-template <typename T, uint DIM>
-struct vector_n : public std::vector<vector_n<T, DIM - 1>>
-{
-    vector_n() : std::vector<vector_n<T, DIM - 1>>()
-    {}
-
-    template <typename... INTS>
-    vector_n(T val, uint mysize, INTS... rest) : std::vector<vector_n<T, DIM-1>>(mysize, vector_n<T, DIM-1>(val, rest...))
-    {
-        static_assert(_all_same<uint, INTS...>::value, "");
-        static_assert(sizeof...(rest) == DIM-1, "");
-    }
-
-    template <typename... INTS>
-    vector_n(uint mysize, INTS... rest) : std::vector<vector_n<T, DIM - 1>>(mysize, vector_n<T, DIM - 1>(rest...))
-    {
-        static_assert(_all_same<uint, INTS...>::value, "");
-        static_assert(sizeof...(rest) == DIM - 1, "");
-    }
-
-private:
-    template <typename TEST, typename T1, typename... REST> struct _all_same { enum { value = _all_same<TEST, T1>::value && _all_same<TEST, REST...>::value }; };
-    template <typename TEST, typename A> struct _all_same<TEST,A>{ enum { value = false }; };
-    template <typename TEST> struct _all_same<TEST,TEST>{ enum { value = true }; };
-};
-
-template <typename T>
-struct vector_n<T, 1> : public std::vector<T>
-{
-    vector_n() : std::vector<T>()
-    {}
-
-    vector_n(T val, uint mysize) : std::vector<T>(mysize, val)
-    {}
-
-    vector_n(uint mysize) : std::vector<T>(mysize)
-    {}
-};
-
-template <typename T>
-struct vector_n<T, 0>
-{
-};
 
 class FanniRPROP
 {
@@ -102,13 +60,13 @@ private:
         Session(uint layers, uint nodes);
         ~Session();
 
-        vector_n<std::atomic_ullong*, 2> inputs;
-        vector_n<double, 2> outputs;
-        vector_n<std::atomic_ullong*, 2> d;
-        vector_n<double, 3> dE; //pochodne bledu po wadze, uzywane przy nauce
-        vector_n<double, 3> pdE; //pochodne bledu po wadze, uzywane przy nauce
-        vector_n<double, 3> delta;
-        vector_n<double, 3> deltaw;
+        vectorn<std::atomic_ullong*, 2> inputs;
+        vectorn<double, 2> outputs;
+        vectorn<std::atomic_ullong*, 2> d;
+        vectorn<double, 3> dE; //pochodne bledu po wadze, uzywane przy nauce
+        vectorn<double, 3> pdE; //pochodne bledu po wadze, uzywane przy nauce
+        vectorn<double, 3> delta;
+        vectorn<double, 3> deltaw;
 
         std::vector<std::thread*> workers;
 
@@ -130,7 +88,7 @@ private:
         double delta_min;
         double error;
         double preverror;
-        vector_n<double, 1> expected;
+        vectorn<double, 1> expected;
     };
 
     Session* initSession() const;

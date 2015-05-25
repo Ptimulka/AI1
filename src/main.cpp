@@ -11,6 +11,7 @@
 #include "io/dir.h"
 #include "ann/cl/oclkernel.h"
 #include "ann/fann_irprop_logical.h"
+#include "ann/ann.h"
 
 using namespace cv;
 using namespace std;
@@ -70,33 +71,18 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    {
-        //FanniRPROP xor_test({ 2, 0, 1 });
-        //auto* session = xor_test.createLearningSession();
-        //xor_test.learn(session, { 0, 1 }, { 1 });
-        ////xor_test.learn(session, { 0, 0 }, { 0 });
-        //
-        ////xor_test.learn(session, { 1, 1 }, { 0 });
-
-        //auto result = xor_test.calc(session, { 1, 0 });
-        //sLog.log("1^0 = ", result.back());
-        //result = xor_test.calc(session, { 0, 1 });
-        //sLog.log("0^1 = ", result.back());
-        //result = xor_test.calc(session, { 0, 0 });
-        //sLog.log("0^0 = ", result.back());
-        //result = xor_test.calc(session, { 1, 1 });
-        //sLog.log("1^1 = ", result.back());
-
-        //xor_test.save(ofstream("xor.ann"));
-        //sLog.close();
-        //return 0;
-    }
-
-
 	///////------UCZENIE SIECIUNI!!!!---------\\\\\\\\
 
 
 	if (Opts::ann_learn) {
+
+        const unsigned bytesPerPixel = sizeof(double);
+        if (Opts::ann_learn_chunk_size < 36 * 28 * bytesPerPixel)
+        {
+            sLog.log("Error: one trainging chunk isn't capable of holding one input image!");
+            sLog.close();
+            return 1;
+        }
 
 		Dir imgs_dir(convert<string, wstring>("fotyUczace"));
 		std::vector<string> paths;
@@ -111,20 +97,21 @@ int main(int argc, char** argv)
 
 		std::vector<Mat> scaledImages = op.getLearningImagesScaledTo(36, 28);	//szerokosæ, wysokoœæ
 
-		for (decltype(scaledImages.size()) i = 0; i < scaledImages.size(); i++) {
-			std::vector<uchar> array;
-			array.assign(scaledImages[i].datastart, scaledImages[i].dataend);
-			std::vector<double> arrayOfDoubles(array.size());
-			for (decltype(array.size()) it = 0; it < array.size(); it++)
-				arrayOfDoubles[it] = array[it];
+        std::vector<double> array;
+        array.reserve(Opts::ann_learn_chunk_size);
 
-			//tu uczenie sieci
+        ArtificialNeuralNetwork ann(Opts::ann_learn_new.isSet() ? vector<uint>{ 36 * 28, 36 * 7, 36, 36 * 2, 1 } : Opts::)
 
-			
+		for (decltype(scaledImages.size()) i = 0; i < scaledImages.size(); )
+        {
+            while (i < scaledImages.size() && array.size() + scaledImages[i].total()*bytesPerPixel < array.capacity())
+            {
+                array.insert(array.end(), scaledImages[i].datastart, scaledImages[i].dataend);
+                ++i;
+            }
+
+
 		}
-
-
-
 
 		return 0;
 	}
@@ -134,7 +121,14 @@ int main(int argc, char** argv)
 
 	///////------TUTAJ NIE UCZENIE SIECIUNI!!!!---------\\\\\\\\
 
+    if (!Opts::ann_file.isSet())
+    {
+        sLog.log("Ann file not specified - using 'default.ann'");
+        Opts::ann_file = string("default.ann");
+    }
 
+    ArtificialNeuralNetwork ann(ifstream("default.ann"));
+    ann.init<ArtificialNeuralNetwork::OclDriver>();
 
     //s?ów kilka a propos ?adowania obrazków,
     // obrazki dzielimy na grupy/paczki/itd. idea jest taka, zeby kazda taka paczka
@@ -252,20 +246,15 @@ int main(int argc, char** argv)
 
 			for (decltype(allRects[i].size()) j = 0; j < allRects[i].size(); j++) {
 
-				std::vector<uchar> array;
+				std::vector<float> array;
 				array.assign(allRects[i][j].datastart, allRects[i][j].dataend);
-				std::vector<double> arrayOfDoubles(array.size());
-				for (decltype(array.size()) it = 0; it < array.size(); it++)
-					arrayOfDoubles[it] = array[it];
 
-				//tu arrayOfDoubles jako wejsce sieci
+                auto result = ann.run(array).front();
 
 				//odpowiedŸ sieci
-				int annAnswer = rand() % 2;	//sieæ w skomplikowany sposób ustala czy obrazek jest samochodem ;)
-				if (annAnswer) {
+				if (result > Opts::ann_accept_threshold) {
 					op.setRectAsCar(i, j);
 				}
-				
 			}
 			
 		}

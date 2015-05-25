@@ -10,6 +10,7 @@ struct OclContext::_Data
 {
     unsigned int ref = 0;
     cl_context context;
+    cl_command_queue queue;
 };
 
 OclContext::OclContext() : OclContext(*OclMgr::singleton().getComputeDevice())
@@ -30,6 +31,11 @@ OclContext::~OclContext()
 void* OclContext::getNativeHandler() const
 {
     return d->context;
+}
+
+void * OclContext::getCommandQueue() const
+{
+    return d->queue;
 }
 
 void * OclContext::createBuffer(BufferMode mode, size_t size, void* src)
@@ -63,6 +69,9 @@ void OclContext::init(void* pptr, void** dptrs, unsigned int dptrs_count)
         d = new _Data;
         d->ref = 1;
         d->context = myself;
+        d->queue = clCreateCommandQueue(d->context, (cl_device_id)dptrs[0], 0, &errcode);
+        if (errcode != CL_SUCCESS)
+            sLog.log("Could not create command queue, error code: ", errcode);
     }
     else
         sLog.log("Error while initializing OpenCL context, error code: ", errcode);

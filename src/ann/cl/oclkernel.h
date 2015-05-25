@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "typedefs.h"
 
 class OclContext;
 
@@ -29,11 +30,15 @@ public:
         return i;
     }
 
+    void run(Instance* i, uint xworkers, uint yworkers) const;
+
 private:
     std::string mypath;
     bool build_success = false;
 
     void* myprogram = nullptr;
+
+    OclContext* mycontext = nullptr;
 
     OclKernel::Instance * _createNewKernel(std::string const & kernelname);
 

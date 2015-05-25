@@ -12,23 +12,31 @@ __kernel void run(
         __global float* outs,
         __global float* w,
         int layers,
+		__global int* layer_sizes,
         int n
 ){
-    int myneuron = get_global_id(0);
-    int prevneuron = get_global_id(1);
+    int myneuron = get_global_id(0)*n + get_global_id(1);
+	
+	__global float* curr_outs = outs+layer_sizes[0];
+	__global float* prev_outs = outs;
 
     for (int lid=1; lid<layers; ++lid)
     {
-        //calculate x as sum of previous outs
-        float tmp = outs[(lid-1)*n + prevneuron] * w[(lid*n + myneuron)*n + prevneuron];
-        atomic_add_float(&outs[lid*n + myneuron], tmp);
+		if (myneuron < layer_sizes[lid])
+		{
+			__global float* myws = w+myneuron*layer_sizes[lid-1];
+			
+			//calculate x as sum of previous outs
+			for (int prevneuron = 0; prevneuron < layer_sizes[lid-1]; ++prevneuron)
+				curr_outs[myneuron] += prev_outs[prevneuron] * myws[prevneuron];
 
-        barrier(CLK_LOCAL_MEM_FENCE);
-
-        //apply activation func
-        if (prevneuron == 0)
-            outs[lid*n + myneuron] = 1.0/exp(-outs[lid*n + myneuron]);
-
+			curr_outs[myneuron] = 1.0/exp(-curr_outs[myneuron]);
+		}
+		
+		prev_outs = curr_outs;
+		curr_outs += layer_sizes[lid];
+		w += layer_sizes[lid]*layer_sizes[lid-1];
+		
         barrier(CLK_GLOBAL_MEM_FENCE);
     }
 }

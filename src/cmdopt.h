@@ -15,6 +15,13 @@ namespace Opts
     extern std::string log_file; //="AI.log"
     extern bool log_file_append; //=false
 	extern bool ann_learn; //=true
+    extern unsigned ann_learn_chunk_size; //=2KB
+
+    extern optional<bool> ann_learn_new;
+    extern optional<std::string> ann_file;
+
     extern optional<std::string> ocl_try_compile;
+
+    extern float ann_accept_threshold;
 }
 

@@ -13,6 +13,8 @@ OclKernel::OclKernel(string const& path, OclContext* context) : mypath(path)
     if (!context)
         context = OclMgr::singleton().getDefaultContext();
 
+    mycontext = context;
+
     std::ifstream in(mypath);
     if (!in.is_open())
     {
@@ -73,6 +75,14 @@ struct OclKernel::Instance
     cl_kernel kernel;
     cl_uint args;
 };
+
+void OclKernel::run(Instance * i, uint xworkers, uint yworkers) const
+{
+    size_t dim[2] = { xworkers, yworkers };
+    cl_event calc_done;
+    clEnqueueNDRangeKernel((cl_command_queue)mycontext->getCommandQueue(), i->kernel, 2, nullptr, dim, dim, 0, nullptr, &calc_done);
+    clWaitForEvents(1, &calc_done);
+}
 
 OclKernel::Instance* OclKernel::_createNewKernel(std::string const& kernelname)
 {

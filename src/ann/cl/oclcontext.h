@@ -14,6 +14,7 @@ public:
 
     inline OclDevice getDevice() const { return device; }
     void* getNativeHandler() const;
+    void* getCommandQueue() const;
 
     enum BufferMode
     {

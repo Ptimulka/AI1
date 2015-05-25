@@ -11,7 +11,12 @@ namespace Opts
     std::string log_file = "AI.log"; //nazwa logu (patrz main.cpp)
     bool log_file_append = false; //czy dopisujemy (patrz main.cpp)
 	bool ann_learn = true; //czy uruchamiamy program aby uczyæ sieæ
+    unsigned ann_learn_chunk_size = 2 * 1024;
+    optional<bool> ann_learn_new;
+    optional<string> ann_file;
     optional<std::string> ocl_try_compile;
+
+    float ann_accept_threshold = 0.85f;
 }
 
 
@@ -67,9 +72,34 @@ namespace
 		0, 1,
 		CMDLINE_ASSIGMENT_HANDLER(Opts::ann_learn));
 
+    static CmdOpt ann_learn_chunk_size(
+        StringList({ "learn-chunk" }),
+        "Specifies memory limit for one training chunk.\n"
+        "Default: 2KB",
+        0, 1,
+        CMDLINE_ASSIGMENT_HANDLER(Opts::ann_learn_chunk_size));
+
+    static CmdOpt ann_learn_new(
+        StringList({ "new-ann "}),
+        "",
+        0, 1,
+        CMDLINE_ASSIGMENT_HANDLER(Opts::ann_learn_new));
+
+    static CmdOpt ann_file(
+        StringList({ "ann" }),
+        "",
+        1, 1,
+        CMDLINE_ASSIGMENT_HANDLER(Opts::ann_file));
+
     static CmdOpt ocl_try_compile(
         StringList({ "ocl-try-compile", "ocl-compile", "compile" }),
         "",
         0, 1,
         CMDLINE_ASSIGMENT_HANDLER(Opts::ocl_try_compile));
+
+    static CmdOpt ann_accept_threshold(
+        StringList({ "ann-threshold" }),
+        "",
+        0, 1,
+        CMDLINE_ASSIGMENT_HANDLER(Opts::ann_accept_threshold);)
 }
