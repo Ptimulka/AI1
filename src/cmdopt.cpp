@@ -10,6 +10,7 @@ namespace Opts
     std::string imgs_groups_regexp = "default.*"; //interesujaca nas grupa/grupy (patrz main.cpp)
     std::string log_file = "AI.log"; //nazwa logu (patrz main.cpp)
     bool log_file_append = false; //czy dopisujemy (patrz main.cpp)
+	bool ann_learn = true; //czy uruchamiamy program aby uczyæ sieæ
     optional<std::string> ocl_try_compile;
 }
 
@@ -58,6 +59,13 @@ namespace
         "Default: false",
         0, 1,
         CMDLINE_ASSIGMENT_HANDLER(Opts::log_file_append));
+
+	static CmdOpt ann_learn(
+		StringList({ "ann-learning" }),
+		"Specifies if ann should learn.\n"
+		"Default: true",
+		0, 1,
+		CMDLINE_ASSIGMENT_HANDLER(Opts::ann_learn));
 
     static CmdOpt ocl_try_compile(
         StringList({ "ocl-try-compile", "ocl-compile", "compile" }),

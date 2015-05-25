@@ -70,27 +70,68 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    //{
-    //    FanniRPROP xor_test({ 2, 3, 1 });
-    //    auto* session = xor_test.createLearningSession();
-    //    xor_test.learn(session, { 0, 1 }, { 1 });
-    //    //xor_test.learn(session, { 0, 0 }, { 0 });
-    //    
-    //    //xor_test.learn(session, { 1, 1 }, { 0 });
+    {
+        //FanniRPROP xor_test({ 2, 0, 1 });
+        //auto* session = xor_test.createLearningSession();
+        //xor_test.learn(session, { 0, 1 }, { 1 });
+        ////xor_test.learn(session, { 0, 0 }, { 0 });
+        //
+        ////xor_test.learn(session, { 1, 1 }, { 0 });
 
-    //    auto result = xor_test.calc(session, { 1, 0 });
-    //    sLog.log("1^0 = ", result.back());
-    //    result = xor_test.calc(session, { 0, 1 });
-    //    sLog.log("0^1 = ", result.back());
-    //    result = xor_test.calc(session, { 0, 0 });
-    //    sLog.log("0^0 = ", result.back());
-    //    result = xor_test.calc(session, { 1, 1 });
-    //    sLog.log("1^1 = ", result.back());
+        //auto result = xor_test.calc(session, { 1, 0 });
+        //sLog.log("1^0 = ", result.back());
+        //result = xor_test.calc(session, { 0, 1 });
+        //sLog.log("0^1 = ", result.back());
+        //result = xor_test.calc(session, { 0, 0 });
+        //sLog.log("0^0 = ", result.back());
+        //result = xor_test.calc(session, { 1, 1 });
+        //sLog.log("1^1 = ", result.back());
 
-    //    xor_test.save(ofstream("xor.ann"));
-    //    sLog.close();
-    //    return 0;
-    //}
+        //xor_test.save(ofstream("xor.ann"));
+        //sLog.close();
+        //return 0;
+    }
+
+
+	///////------UCZENIE SIECIUNI!!!!---------\\\\\\\\
+
+
+	if (Opts::ann_learn) {
+
+		Dir imgs_dir(convert<string, wstring>("fotyUczace"));
+
+		std::vector<string> paths; 
+		//jeszcze trzeba sk¹dœ wzi¹æ odpowiedzi!
+
+		ImageOperations op;
+		op.loadVectorOfImagesToLearn(paths);
+
+		std::vector<Mat> scaledImages = op.getLearningImagesScaledTo(36, 28);	//szerokosæ, wysokoœæ
+
+		for (decltype(scaledImages.size()) i = 0; i < scaledImages.size(); i++) {
+			std::vector<uchar> array;
+			array.assign(scaledImages[i].datastart, scaledImages[i].dataend);
+			std::vector<double> arrayOfDoubles(array.size());
+			for (decltype(array.size()) it = 0; it < array.size(); it++)
+				arrayOfDoubles[it] = array[it];
+
+			//tu uczenie sieci
+
+			
+		}
+
+
+
+
+		return 0;
+	}
+
+
+
+
+	///////------TUTAJ NIE UCZENIE SIECIUNI!!!!---------\\\\\\\\
+
+
 
     //s?ów kilka a propos ?adowania obrazków,
     // obrazki dzielimy na grupy/paczki/itd. idea jest taka, zeby kazda taka paczka
@@ -198,7 +239,7 @@ int main(int argc, char** argv)
 
 
 		//teraz czas na ann!!!
-		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(50, 30);	//pobieramy obrazki ju¿ przystosowane na wejscie, o takim rozmiarze
+		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(36, 28);	//pobieramy obrazki ju¿ przystosowane na wejscie, o takim rozmiarze
 
 		//aby obczaiæ obrazki te niby gotowe na sieæ neuronow¹ trzeba daæ tu breakpointa i przejrzeæ wektor wektorów allRects!!!
 
@@ -206,7 +247,7 @@ int main(int argc, char** argv)
 		//po kolei dla ka¿dego obrazka obczajamy 
 		for (decltype(allRects.size()) i = 0; i < allRects.size(); i++) {
 
-			for (int j = 0; j < allRects[i].size(); j++) {
+			for (decltype(allRects[i].size()) j = 0; j < allRects[i].size(); j++) {
 
 				std::vector<uchar> array;
 				array.assign(allRects[i][j].datastart, allRects[i][j].dataend);
@@ -217,7 +258,7 @@ int main(int argc, char** argv)
 				//tu arrayOfDoubles jako wejsce sieci
 
 				//odpowiedŸ sieci
-				bool annAnswer = rand() % 2;	//sieæ w skomplikowany sposób ustala czy obrazek jest samochodem ;)
+				int annAnswer = rand() % 2;	//sieæ w skomplikowany sposób ustala czy obrazek jest samochodem ;)
 				if (annAnswer) {
 					op.setRectAsCar(i, j);
 				}
