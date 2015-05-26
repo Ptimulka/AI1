@@ -174,17 +174,29 @@ ArtificialNeuralNetwork::ArtificialNeuralNetwork(std::vector<uint> nodes_in_laye
         w = (decay<decltype(w)>::type)rand() / RAND_MAX;
 }
 
-ArtificialNeuralNetwork::ArtificialNeuralNetwork(istream & load)
+ArtificialNeuralNetwork::ArtificialNeuralNetwork(istream & load, bool native, char* configuration_file)
 {
-    uint lcount;
-    load.read((char*)&lcount, sizeof(lcount));
-    layers.resize(lcount);
-    for (auto& l : layers)
-        load.read((char*)&l, sizeof(l));
+	if (!native)
+	{
+		uint lcount;
+		load.read((char*)&lcount, sizeof(lcount));
+		layers.resize(lcount);
+		for (auto& l : layers)
+			load.read((char*)&l, sizeof(l));
 
-    weights.resize(getConnectionsCount());
-    for (auto& w : weights)
-        load.read((char*)&w, sizeof(w));
+		weights.resize(getConnectionsCount());
+		for (auto& w : weights)
+			load.read((char*)&w, sizeof(w));
+	}
+	else
+	{
+		uint type = *reinterpret_cast<uint*>(driver);
+		if (type == FANN_DRIVER)
+		{
+			FannDriver* d = reinterpret_cast<FannDriver*>(driver);
+			d->ann = fann_create_from_file(configuration_file);
+		}
+	}
 }
 
 ArtificialNeuralNetwork::~ArtificialNeuralNetwork()
@@ -246,15 +258,27 @@ vector<float> ArtificialNeuralNetwork::run(vector<float> in)
     return ret;
 }
 
-void ArtificialNeuralNetwork::save(ostream & out) const
+void ArtificialNeuralNetwork::save(ostream & out, bool native, char* configuration_file) const
 {
-    uint lcount = layers.size();
-    out.write((char*)&lcount, sizeof(lcount));
-    for (auto& l : layers)
-        out.write((char*)&l, sizeof(l));
+	if (!native)
+	{
+		uint lcount = layers.size();
+		out.write((char*)&lcount, sizeof(lcount));
+		for (auto& l : layers)
+			out.write((char*)&l, sizeof(l));
 
-    for (auto& w : weights)
-        out.write((char*)&w, sizeof(w));
+		for (auto& w : weights)
+			out.write((char*)&w, sizeof(w));
+	}
+	else 
+	{
+		uint type = *reinterpret_cast<uint*>(driver);
+		if (type == FANN_DRIVER)
+		{
+			FannDriver* d = reinterpret_cast<FannDriver*>(driver);
+			fann_save(d->ann, configuration_file);
+		}
+	}
 }
 
 void ArtificialNeuralNetwork::_initFann(uint trains)
