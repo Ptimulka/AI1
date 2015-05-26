@@ -84,6 +84,9 @@
     <ClCompile Include="..\..\src\ann\fann_irprop_logical.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ann\ann.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\utils\cmdline.h">
