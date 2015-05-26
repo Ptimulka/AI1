@@ -72,7 +72,7 @@ int main(int argc, char** argv)
     }
 
     {
-        ArtificialNeuralNetwork ann({ 2, 3, 1 });
+		ArtificialNeuralNetwork ann({ 2, 3, 1 });
         ann.init<ArtificialNeuralNetwork::FannDriver>(3u);
         
         vector<float> inputs = { 0.0, 0.0, 0.0, 1.0, 1.0, 1.0 };
