@@ -7,9 +7,34 @@
 #include "cl/oclcontext.h"
 #include "cl/oclmgr.h"
 
+#include <map>
 #include <algorithm>
 #include <CL/cl.h>
 using namespace std;
+
+template <typename T>
+T& get_weight(vector<T>& v, uint l, uint curr, uint prev, vector<uint> const& s)
+{
+    assert(l > 0);
+
+    uint offset = 0;
+    for (uint i = 1; i < l; ++i)
+        offset += s[i]*s[i-1];
+    offset += s[l - 1] * curr;
+    return v[prev + offset];
+}
+
+template <typename T>
+T const& get_weight(vector<T> const& v, uint l, uint curr, uint prev, vector<uint> const& s)
+{
+    assert(l > 0);
+
+    uint offset = 0;
+    for (uint i = 1; i < l; ++i)
+        offset += s[i] * s[i - 1];
+    offset += s[l - 1] * curr;
+    return v[prev + offset];
+}
 
 struct ArtificialNeuralNetwork::FannDriver
 {
@@ -18,18 +43,68 @@ struct ArtificialNeuralNetwork::FannDriver
     fann* ann = nullptr;
     fann_train_data* data = nullptr;
 
-    FannDriver(vector<uint> const& layers, uint training_data)
+    struct FannNodeCoords
     {
-        ann = fann_create_standard(layers.size(), layers.front());
+        uint layer;
+        uint neuron;
+    };
+
+    map<void*, FannNodeCoords> nodesmap;
+
+    struct 
+
+    FannDriver(vector<uint> const& layers, vector<float> const& weights, uint training_data)
+    {
+        ann = fann_create_standard_array(layers.size(), layers.data());
         fann_set_activation_function_hidden(ann, FANN_SIGMOID);
         fann_set_activation_function_output(ann, FANN_SIGMOID);
         fann_set_activation_steepness_hidden(ann, 0.5f);
         fann_set_activation_steepness_output(ann, 0.5f);
+        fann_set_train_stop_function(ann, FANN_STOPFUNC_MSE);
 
         if (training_data)
             data = fann_create_train(training_data, layers.front(), layers.back());
         else
             data = nullptr;
+
+        { //copied from fann's fann_set_weight
+
+            unsigned inttype source_index = 0;
+
+            auto first_neuron = ann->first_layer->first_neuron;
+
+            /* Find the connection, simple brute force search through the network
+            for one or more connections that match to minimize datastructure dependencies.
+            Nothing is done if the connection does not already exist in the network. */
+
+            uint layer_idx = 0;
+            for (auto layer_it = ann->first_layer; layer_it != ann->last_layer; layer_it++, ++layer_idx)
+            {
+                uint neuron_idx = 0;
+                for (auto neuron_it = layer_it->first_neuron; neuron_it != layer_it->last_neuron - 1; neuron_it++, ++neuron_idx)
+                {
+                    nodesmap.insert(make_pair(neuron_it, FannNodeCoords{ layer_idx, neuron_idx }));
+                }
+            }
+
+            /* for each layer */
+            for (auto layer_it = ann->first_layer; layer_it != ann->last_layer; layer_it++)
+            {
+                /* for each neuron */
+                for (auto neuron_it = layer_it->first_neuron; neuron_it < layer_it->last_neuron - 1; neuron_it++)
+                {
+                    /* for each connection */
+                    for (auto idx = neuron_it->first_con; neuron_it->last_con != 0 && idx < neuron_it->last_con - 1; idx++)
+                    {
+                        auto& from = nodesmap[ann->connections[idx]];
+                        auto& to = nodesmap[neuron_it];
+                        assert(from.layer + 1 == to.layer);
+
+                        ann->weights[idx] = get_weight(weights, to.layer, to.neuron, from.neuron, layers);
+                    }
+                }
+            }
+        }
     }
 
     ~FannDriver()
@@ -39,6 +114,29 @@ struct ArtificialNeuralNetwork::FannDriver
 
         data = nullptr;
         ann = nullptr;
+    }
+
+    void fetchWeights(vector<float>& weights, vector<uint> const& layers)
+    {
+        unsigned inttype source_index = 0;
+
+        /* for each layer */
+        for (auto layer_it = ann->first_layer; layer_it != ann->last_layer; layer_it++)
+        {
+            /* for each neuron */
+            for (auto neuron_it = layer_it->first_neuron; neuron_it != layer_it->last_neuron - 1; neuron_it++)
+            {
+                /* for each connection */
+                for (auto idx = neuron_it->first_con; neuron_it->last_con != 0 && idx < neuron_it->last_con - 1; idx++)
+                {
+                    auto& from = nodesmap[ann->connections[idx]];
+                    auto& to = nodesmap[neuron_it];
+                    assert(from.layer + 1 == to.layer);
+
+                    get_weight(weights, to.layer, to.neuron, from.neuron, layers) = ann->weights[idx];
+                }
+            }
+        }
     }
 };
 
@@ -112,8 +210,8 @@ void ArtificialNeuralNetwork::learn(vector<float> tests, vector<float> results)
         memcpy(d->data->output[i], results.data() + d->data->num_output*i, d->data->num_output);
     }
 
-    fann_train_on_data(d->ann, d->data, 5000, 500, 0.05);
-    fann_connection a;
+    fann_train_on_data(d->ann, d->data, 5000, 500, 0.05f);
+    d->fetchWeights(weights, layers);
 }
 
 vector<float> ArtificialNeuralNetwork::run(vector<float> in)
@@ -148,9 +246,20 @@ vector<float> ArtificialNeuralNetwork::run(vector<float> in)
     return ret;
 }
 
+void ArtificialNeuralNetwork::save(ostream & out) const
+{
+    uint lcount = layers.size();
+    out.write((char*)&lcount, sizeof(lcount));
+    for (auto& l : layers)
+        out.write((char*)&l, sizeof(l));
+
+    for (auto& w : weights)
+        out.write((char*)&w, sizeof(w));
+}
+
 void ArtificialNeuralNetwork::_initFann(uint trains)
 {
-    driver = new FannDriver(layers, trains);
+    driver = new FannDriver(layers, weights, trains);
 
 }
 

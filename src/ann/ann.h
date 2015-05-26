@@ -50,6 +50,8 @@ public:
         return connections;
     }
 
+    void save(std::ostream& out) const;
+
 private:
     void* driver;
 

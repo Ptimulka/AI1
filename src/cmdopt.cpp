@@ -101,5 +101,5 @@ namespace
         StringList({ "ann-threshold" }),
         "",
         0, 1,
-        CMDLINE_ASSIGMENT_HANDLER(Opts::ann_accept_threshold);)
+        CMDLINE_ASSIGMENT_HANDLER(Opts::ann_accept_threshold));
 }
