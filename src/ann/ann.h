@@ -18,8 +18,7 @@ public:
 
 public:
     ArtificialNeuralNetwork(std::vector<uint> nodes_in_layers);
-	ArtificialNeuralNetwork(std::istream& load, bool native = false, char* configuration_file = "");
-
+    ArtificialNeuralNetwork(std::istream& load, bool native = false, uint trains = 0, char* configuration_file = "default.ann");
     ~ArtificialNeuralNetwork();
 
     template <typename DRIVER, typename... DONOTPASS>
@@ -50,7 +49,7 @@ public:
         return connections;
     }
 
-	void save(std::ostream& out, bool native = false, char* configuration_file = "") const;
+    void save(std::ostream& out, bool native = false, char* configuration_file = "default.ann") const;
 
 private:
     void* driver;
