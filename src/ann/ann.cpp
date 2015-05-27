@@ -236,6 +236,10 @@ void ArtificialNeuralNetwork::learn(vector<float> tests, vector<float> results)
     }
 
     FannDriver* d = reinterpret_cast<FannDriver*>(driver);
+	uint old_data = d->data->num_data;
+	d->data->num_data = tests.size() / d->data->num_input;
+
+	assert(d->data->num_data <= old_data);
     assert(tests.size() == d->data->num_data*d->data->num_input);
     assert(results.size() == d->data->num_data*d->data->num_output);
 
@@ -245,8 +249,9 @@ void ArtificialNeuralNetwork::learn(vector<float> tests, vector<float> results)
         memcpy(d->data->output[i], results.data() + d->data->num_output*i, d->data->num_output);
     }
 
-    fann_train_on_data(d->ann, d->data, 5000, 500, 0.05f);
+    fann_train_on_data(d->ann, d->data, 5000, 500, 0.0001f);
     d->fetchWeights(weights, layers);
+	d->data->num_data = old_data;
 }
 
 vector<float> ArtificialNeuralNetwork::run(vector<float> in)

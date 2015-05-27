@@ -59,7 +59,7 @@ vector<OclDevice> OclPlatform::queryDevices() const
     clGetDeviceIDs(d->id, CL_DEVICE_TYPE_ALL, 0, nullptr, &deviceIdCount);
 
     std::vector<cl_device_id> deviceIds(deviceIdCount);
-    clGetDeviceIDs(d->id, CL_DEVICE_TYPE_ALL, deviceIdCount, deviceIds.data(), nullptr);
+	clGetDeviceIDs(d->id, CL_DEVICE_TYPE_ALL, deviceIdCount, deviceIds.data(), nullptr);
 
     vector<OclDevice> ret;
     for (auto did : deviceIds)

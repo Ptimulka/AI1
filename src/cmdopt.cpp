@@ -10,8 +10,8 @@ namespace Opts
     std::string imgs_groups_regexp = "default.*"; //interesujaca nas grupa/grupy (patrz main.cpp)
     std::string log_file = "AI.log"; //nazwa logu (patrz main.cpp)
     bool log_file_append = false; //czy dopisujemy (patrz main.cpp)
-	bool ann_learn = true; //czy uruchamiamy program aby uczyæ sieæ
-    unsigned ann_learn_chunk_size = 2 * 1024;
+	bool ann_learn = false; //czy uruchamiamy program aby uczyæ sieæ
+    unsigned ann_learn_chunk_size = 2 * 1024 * 1024;
     optional<bool> ann_learn_new;
     optional<string> ann_file;
     optional<std::string> ocl_try_compile;

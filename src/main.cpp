@@ -72,7 +72,7 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    {
+    /*{
 		ArtificialNeuralNetwork ann({ 2, 3, 1 });
         ann.init<ArtificialNeuralNetwork::FannDriver>(3u);
         
@@ -89,20 +89,26 @@ int main(int argc, char** argv)
 
         sLog.close();
         return 0;
-    }
+    }*/
 
 	///////------UCZENIE SIECIUNI!!!!---------\\\\\\\\
 
 
 	if (Opts::ann_learn) {
 
-        const unsigned bytesPerPixel = sizeof(double);
-        if (Opts::ann_learn_chunk_size < 36 * 28 * bytesPerPixel)
+        const unsigned bytesPerPixel = sizeof(float);
+		const unsigned bytesPerCase = 36 * 28 * bytesPerPixel;
+		if (Opts::ann_learn_chunk_size < bytesPerCase)
         {
             sLog.log("Error: one trainging chunk isn't capable of holding one input image!");
             sLog.close();
             return 1;
         }
+
+		const unsigned casesPerRun = Opts::ann_learn_chunk_size / bytesPerCase;
+
+		ArtificialNeuralNetwork ann({ 36*28, 36, 36*4, 1 });
+		ann.init<ArtificialNeuralNetwork::FannDriver>(casesPerRun);
 
 		Dir imgs_dir(convert<string, wstring>("fotyUczace"));
 		std::vector<string> pathsPos;
@@ -114,48 +120,49 @@ int main(int argc, char** argv)
 		for (auto image : imgs_dir.getEntries(L"neg.*"))
 			pathsNeg.push_back(convert<wstring, string>(image));
 
-
-		
-
 		ImageOperations op;
 
-		//najpierw pozytywne
+		std::vector<float> array;
+		array.reserve(Opts::ann_learn_chunk_size);
+		std::vector<float> results;
+
 		op.loadVectorOfImagesToLearn(pathsPos);
-		std::vector<Mat> scaledImages = op.getLearningImagesScaledTo(36, 28);	//szerokosæ, wysokoœæ
-
-        std::vector<double> array;
-        array.reserve(Opts::ann_learn_chunk_size);
-		
-		//todo pos
-
-		//a tera negatywne
+		std::vector<Mat> learn_pos = op.getLearningImagesScaledTo(36, 28);	//szerokosæ, wysokoœæ
 		op.loadVectorOfImagesToLearn(pathsNeg);
-		scaledImages = op.getLearningImagesScaledTo(36, 28);
+		std::vector<Mat> learn_neg = op.getLearningImagesScaledTo(36, 28);
 
+		vector<pair<bool, uint>> tests;
+		for (uint i = 0; i < learn_pos.size(); ++i)
+			tests.push_back(make_pair(true, i));
+		for (uint i = 0; i < learn_neg.size(); ++i)
+			tests.push_back(make_pair(false, i));
+		std::random_shuffle(tests.begin(), tests.end());
 
-		//to samo co dla pos
-		for (decltype(scaledImages.size()) i = 0; i < scaledImages.size(); i++) {
-			std::vector<uchar> array;
-			array.assign(scaledImages[i].datastart, scaledImages[i].dataend);
-			std::vector<double> arrayOfDoubles(array.size());
-			for (decltype(array.size()) it = 0; it < array.size(); it++)
-				arrayOfDoubles[it] = array[it];
+		results.reserve(casesPerRun);
 
-			//tu uczenie sieci
+		for (uint i = 0; i < tests.size(); ++i)
+		{
+			int j = 0;
+			for (; j < casesPerRun && i < tests.size(); ++j, ++i)
+				if (tests[i].first)
+				{
+					array.insert(array.end(), learn_pos[tests[i].second].datastart, learn_pos[tests[i].second].dataend);
+					results.push_back(1.0f);
+				}
+				else
+				{
+					array.insert(array.end(), learn_neg[tests[i].second].datastart, learn_neg[tests[i].second].dataend);
+					results.push_back(0.0f);
+				}
 
+			ann.learn(array, results);
+			array.clear();
+			results.clear();
 		}
 
-		for (decltype(scaledImages.size()) i = 0; i < scaledImages.size(); )
-        {
-            while (i < scaledImages.size() && array.size() + scaledImages[i].total()*bytesPerPixel < array.capacity())
-            {
-                array.insert(array.end(), scaledImages[i].datastart, scaledImages[i].dataend);
-                ++i;
-            }
+		ann.saveNative("test.ann");
 
-
-		}
-
+		sLog.close();
 		return 0;
 	}
 
@@ -170,8 +177,8 @@ int main(int argc, char** argv)
         Opts::ann_file = string("default.ann");
     }
 
-    ArtificialNeuralNetwork ann(ifstream("default.ann"));
-    ann.init<ArtificialNeuralNetwork::OclDriver>();
+    ArtificialNeuralNetwork ann;
+    ann.init<ArtificialNeuralNetwork::FannDriver>("test.ann", 0u);
 
     //s?ów kilka a propos ?adowania obrazków,
     // obrazki dzielimy na grupy/paczki/itd. idea jest taka, zeby kazda taka paczka
@@ -283,16 +290,18 @@ int main(int argc, char** argv)
 
 		//aby obczaiæ obrazki te niby gotowe na sieæ neuronow¹ trzeba daæ tu breakpointa i przejrzeæ wektor wektorów allRects!!!
 
-
+		
 		//po kolei dla ka¿dego obrazka obczajamy 
 		for (decltype(allRects.size()) i = 0; i < allRects.size(); i++) {
 
+			vector<float> results;
 			for (decltype(allRects[i].size()) j = 0; j < allRects[i].size(); j++) {
 
 				std::vector<float> array;
 				array.assign(allRects[i][j].datastart, allRects[i][j].dataend);
 
                 auto result = ann.run(array).front();
+				results.push_back(result);
 
 				//odpowiedŸ sieci
 				if (result > Opts::ann_accept_threshold) {
@@ -300,6 +309,7 @@ int main(int argc, char** argv)
 				}
 			}
 			
+			continue;
 		}
 
 
