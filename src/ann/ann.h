@@ -17,8 +17,9 @@ public:
     struct OclDriver;
 
 public:
+	ArtificialNeuralNetwork();
     ArtificialNeuralNetwork(std::vector<uint> nodes_in_layers);
-    ArtificialNeuralNetwork(std::istream& load, bool native = false, uint trains = 0, char* configuration_file = "default.ann");
+    ArtificialNeuralNetwork(std::istream& load);
     ~ArtificialNeuralNetwork();
 
     template <typename DRIVER, typename... DONOTPASS>
@@ -29,6 +30,12 @@ public:
     {
         _initFann(trains);
     }
+
+	template <>
+	void init<FannDriver>(const char* loadfromfile, uint trains)
+	{
+		_initFann(loadfromfile, trains);
+	}
 
     template <>
     void init<OclDriver>()
@@ -49,7 +56,8 @@ public:
         return connections;
     }
 
-    void save(std::ostream& out, bool native = false, char* configuration_file = "default.ann") const;
+    void save(std::ostream& out) const;
+	void saveNative(std::string const& filename) const;
 
 private:
     void* driver;
@@ -58,5 +66,6 @@ private:
     std::vector<float> weights;
 
     void _initFann(uint trains);
+	void _initFann(std::string const& loadfromfile, uint trains);
     void _initOcl();
 };

@@ -51,8 +51,6 @@ struct ArtificialNeuralNetwork::FannDriver
 
     map<void*, FannNodeCoords> nodesmap;
 
-    struct 
-
     FannDriver(vector<uint> const& layers, vector<float> const& weights, uint training_data, fann *fann = nullptr)
     {
         if (fann!=nullptr)
@@ -112,6 +110,32 @@ struct ArtificialNeuralNetwork::FannDriver
         }
         
     }
+
+	FannDriver(const char* filename, uint trains)
+	{
+		ann = fann_create_from_file(filename);
+		uint lcount = fann_get_num_layers(ann);
+		uint *l = new uint[lcount];
+		fann_get_layer_array(ann, l);
+
+		if (trains)
+			data = fann_create_train(trains, l[0], l[lcount-1]);
+		else
+			data = nullptr;
+
+		delete[] l;
+
+		uint layer_idx = 0;
+		for (auto layer_it = ann->first_layer; layer_it != ann->last_layer; layer_it++, ++layer_idx)
+		{
+			uint neuron_idx = 0;
+			for (auto neuron_it = layer_it->first_neuron; neuron_it != layer_it->last_neuron - 1; neuron_it++, ++neuron_idx)
+			{
+				nodesmap.insert(make_pair(neuron_it, FannNodeCoords{ layer_idx, neuron_idx }));
+			}
+		}
+
+	}
 
     ~FannDriver()
     {
@@ -174,57 +198,28 @@ struct ArtificialNeuralNetwork::OclDriver
     }
 };
 
+ArtificialNeuralNetwork::ArtificialNeuralNetwork() : layers(), weights()
+{
+
+}
+
 ArtificialNeuralNetwork::ArtificialNeuralNetwork(std::vector<uint> nodes_in_layers) : layers(nodes_in_layers), weights(getConnectionsCount())
 {
     for (auto& w : weights)
         w = (decay<decltype(w)>::type)rand() / RAND_MAX;
 }
 
-ArtificialNeuralNetwork::ArtificialNeuralNetwork(istream & load, bool native, uint trains, char* configuration_file)
+ArtificialNeuralNetwork::ArtificialNeuralNetwork(istream& load)
 {
-    if (!native)
-    {
-        uint lcount;
-        load.read((char*)&lcount, sizeof(lcount));
-        layers.resize(lcount);
-        for (auto& l : layers)
-            load.read((char*)&l, sizeof(l));
+    uint lcount;
+    load.read((char*)&lcount, sizeof(lcount));
+    layers.resize(lcount);
+    for (auto& l : layers)
+        load.read((char*)&l, sizeof(l));
 
-        weights.resize(getConnectionsCount());
-        for (auto& w : weights)
-            load.read((char*)&w, sizeof(w));
-    }
-    else
-    {
-        fann *ann = fann_create_from_file(configuration_file);
-        uint lcount = fann_get_num_layers(ann);
-        
-        uint *l = new uint[lcount];
-        fann_get_layer_array(ann, l);
-        layers.resize(lcount);
-        for (int i = 0; i < lcount; i++)
-            layers.at(i) = l[i];
-        delete[] l;
-
-       /* weights.resize(getConnectionsCount());
-        fann_connection *c = new fann_connection[weights.size()];
-        fann_get_connection_array(ann, c);
-        for (int i = 0; i < weights.size(); i++)
-            weights.at(i) = c[i].weight;
-        delete[] c;*/
-        
-        driver = new FannDriver(layers, weights, trains, ann);
-        /*FannDriver* d = reinterpret_cast<FannDriver*>(driver);
-        uint lcount = fann_get_num_layers(d->ann);
-        uint *l = new uint[lcount];
-        fann_get_layer_array(d->ann, l);
-        layers.resize(lcount);
-        for (int i = 0; i < lcount; i++)
-            layers.at(i) = l[i];
-        delete[] l;*/
-        //layers.at(0) = fann_get_num_input(d->ann);
-        //layers.at(lcount-1) = fann_get_num_output(d->ann);       
-    }
+    weights.resize(getConnectionsCount());
+    for (auto& w : weights)
+        load.read((char*)&w, sizeof(w));
 }
 
 ArtificialNeuralNetwork::~ArtificialNeuralNetwork()
@@ -286,33 +281,44 @@ vector<float> ArtificialNeuralNetwork::run(vector<float> in)
     return ret;
 }
 
-void ArtificialNeuralNetwork::save(ostream & out, bool native, char* configuration_file) const
+void ArtificialNeuralNetwork::save(ostream & out) const
 {
-    if (!native)
-    {
-        uint lcount = layers.size();
-        out.write((char*)&lcount, sizeof(lcount));
-        for (auto& l : layers)
-            out.write((char*)&l, sizeof(l));
+    uint lcount = layers.size();
+    out.write((char*)&lcount, sizeof(lcount));
+    for (auto& l : layers)
+        out.write((char*)&l, sizeof(l));
 
-        for (auto& w : weights)
-            out.write((char*)&w, sizeof(w));
-    }
-    else 
-    {
-        uint type = *reinterpret_cast<uint*>(driver);
-        if (type == FANN_DRIVER)
-        {
-            FannDriver* d = reinterpret_cast<FannDriver*>(driver);
-            fann_save(d->ann, configuration_file);
-        }
-    }
+    for (auto& w : weights)
+        out.write((char*)&w, sizeof(w));
+
+}
+
+void ArtificialNeuralNetwork::saveNative(string const& filename) const
+{
+	uint type = *reinterpret_cast<uint*>(driver);
+	if (type == FANN_DRIVER)
+	{
+		FannDriver* d = reinterpret_cast<FannDriver*>(driver);
+		fann_save(d->ann, filename.c_str());
+	}
 }
 
 void ArtificialNeuralNetwork::_initFann(uint trains)
 {
     driver = new FannDriver(layers, weights, trains);
+}
 
+void ArtificialNeuralNetwork::_initFann(std::string const& loadfromfile, uint trains)
+{
+	auto _driver = new FannDriver(loadfromfile.c_str(), trains);
+	uint lcount = fann_get_num_layers(_driver->ann);
+	uint *l = new uint[lcount];
+	fann_get_layer_array(_driver->ann, l);
+	layers.assign(l, l + lcount);
+	weights.resize(getConnectionsCount());
+	_driver->fetchWeights(weights, layers);
+
+	driver = _driver;
 }
 
 void ArtificialNeuralNetwork::_initOcl()

@@ -79,15 +79,13 @@ int main(int argc, char** argv)
         vector<float> inputs = { 0.0, 0.0, 0.0, 1.0, 1.0, 1.0 };
         vector<float> results = { 0.0, 1.0, 0.0 };
         ann.learn(inputs, results);
-        ann.save(ofstream("default.ann"), true, "default1.ann");
+        ann.saveNative("default1.ann");
         
-        //fann *ann2 = fann_create_from_file("default1.ann");
-        ArtificialNeuralNetwork ann2(ifstream{ "default.ann" }, true, 0u, "default1.ann");
-        //ann2.init<ArtificialNeuralNetwork::FannDriver>(0u );
+        ArtificialNeuralNetwork ann2;
+        ann2.init<ArtificialNeuralNetwork::FannDriver>("default1.ann", 0u);
 
         auto r1 = ann.run({ 1.0, 0.0 }).front();
         auto r2 = ann2.run({ 1.0, 0.0 }).front();
-        //auto r2 = fann_run(ann2, { 1.0, 0.0 });
 
         sLog.close();
         return 0;
