@@ -93,11 +93,12 @@ int main(int argc, char** argv)
 
 	///////------UCZENIE SIECIUNI!!!!---------\\\\\\\\
 
+	uint iw = 20, ih = 14;	//image with, height
 
 	if (Opts::ann_learn) {
 
-        const unsigned bytesPerPixel = sizeof(float);
-		const unsigned bytesPerCase = 36 * 28 * bytesPerPixel;
+	    const unsigned bytesPerPixel = sizeof(float);
+		const unsigned bytesPerCase = iw * ih * bytesPerPixel;
 		if (Opts::ann_learn_chunk_size < bytesPerCase)
         {
             sLog.log("Error: one trainging chunk isn't capable of holding one input image!");
@@ -107,7 +108,8 @@ int main(int argc, char** argv)
 
 		const unsigned casesPerRun = Opts::ann_learn_chunk_size / bytesPerCase;
 
-		ArtificialNeuralNetwork ann({ 36*28, 36, 36*4, 1 });
+		//ArtificialNeuralNetwork ann({ iw*ih, 36, 36*4, 1 });
+		ArtificialNeuralNetwork ann({ iw*ih, iw*ih+9,  1 });	//takie sobie parametry dalam z sufitu, bo chialam wyprobowac i tak zostalo xD
 		ann.init<ArtificialNeuralNetwork::FannDriver>(casesPerRun);
 
 		Dir imgs_dir(convert<string, wstring>("fotyUczace"));
@@ -120,6 +122,8 @@ int main(int argc, char** argv)
 		for (auto image : imgs_dir.getEntries(L"neg.*"))
 			pathsNeg.push_back(convert<wstring, string>(image));
 
+		
+
 		ImageOperations op;
 
 		std::vector<float> array;
@@ -127,9 +131,9 @@ int main(int argc, char** argv)
 		std::vector<float> results;
 
 		op.loadVectorOfImagesToLearn(pathsPos);
-		std::vector<Mat> learn_pos = op.getLearningImagesScaledTo(36, 28);	//szerokosæ, wysokoœæ
+		std::vector<Mat> learn_pos = op.getLearningImagesScaledTo(iw, ih);	//szerokosæ, wysokoœæ
 		op.loadVectorOfImagesToLearn(pathsNeg);
-		std::vector<Mat> learn_neg = op.getLearningImagesScaledTo(36, 28);
+		std::vector<Mat> learn_neg = op.getLearningImagesScaledTo(iw, ih);
 
 		vector<pair<bool, uint>> tests;
 		for (uint i = 0; i < learn_pos.size(); ++i)
@@ -167,7 +171,54 @@ int main(int argc, char** argv)
 	}
 
 
+	//////   TUTAJ SPRAWDZANKO CZY NAUCZONA SIEC ZWRACA SPOKO WYNIKI DLA DANYCH UCZACYCH!!!
 
+	if (Opts::ann_tli) {
+
+		Dir imgs_dir(convert<string, wstring>("fotyUczace"));
+		std::vector<string> pathsPos;
+		std::vector<string> pathsNeg;
+
+		for (auto image : imgs_dir.getEntries(L"pos.*"))
+			pathsPos.push_back(convert<wstring, string>(image));
+
+		for (auto image : imgs_dir.getEntries(L"neg.*"))
+			pathsNeg.push_back(convert<wstring, string>(image));
+
+
+		ImageOperations op;
+		op.loadVectorOfImagesToLearn(pathsPos);
+		std::vector<Mat> learn_pos = op.getLearningImagesScaledTo(iw, ih);	//szerokosæ, wysokoœæ
+		op.loadVectorOfImagesToLearn(pathsNeg);
+		std::vector<Mat> learn_neg = op.getLearningImagesScaledTo(iw, ih);
+
+		ArtificialNeuralNetwork ann;
+		ann.init<ArtificialNeuralNetwork::FannDriver>("test.ann", 0u);
+
+		std::vector<float> results_pos;
+		std::vector<float> results_neg;
+
+		for (uint i = 0; i < learn_pos.size(); i++) {
+			std::vector < float > input_array;
+			input_array.assign(learn_pos[i].datastart, learn_pos[i].dataend);
+			float answer = ann.run(input_array).front();
+			results_pos.push_back(answer);
+			continue;
+		}
+
+		for (uint i = 0; i < learn_neg.size(); i++) {
+			std::vector < float > input_array;
+			input_array.assign(learn_neg[i].datastart, learn_neg[i].dataend);
+			float answer = ann.run(input_array).front();
+			results_neg.push_back(answer);
+			continue;
+		}
+
+		//tu breakpoint i sprawdzamy czy results_pos i results_neg sa odpowiednio bliskie 1 albo bliskie 0!
+		sLog.close();
+		return 0;
+
+	}
 
 	///////------TUTAJ NIE UCZENIE SIECIUNI!!!!---------\\\\\\\\
 
@@ -207,90 +258,54 @@ int main(int argc, char** argv)
     Dir imgs_dir(convert<string, wstring>(Opts::imgs_dir));
 
 	int groupNumber = 1;
-	cv::ocl::setUseOpenCL(false);
-
+	cv::ocl::setUseOpenCL(false);		//czy opencv ma korzystac z opencl
 
     for (Dir group : imgs_dir.getSubDirs()) //pobieramy liste podkatalog i przegladamy ja (patrz: C++ 11 range-based for)
     {
         if (!regex_match(group.name(), group_regexp)) //sprawdzamy czy nazwa podkatalogu pasuje do nazwy grupy podanej jako wyrazenie regularne (Opts::imgs_groups_regexp)
-            continue; //jesli nie to pomijamy
+            continue; //jesli nie to pomijamy     
 
-        //jesli tak to pobieramy liste plikow/katalogow ktore pasuje do wyrazenie 'ref.*' (patrz obrazek referecyjny wy?ej)
-		//pozwolilam to sobie zakomentowac, bo niepoczebny referencyjny :)
-        //auto refimg = group.getEntries(L"ref.*");
-        //if (refimg.empty()) //nie znaleziono nic
-        //{
-        //    sLog.log("Group ", group.path(), " doesn't have reference image in it!");
-        //    continue;
-        //}
-        //if (refimg.size() > 1) //znaleziono wiecej niz jeden
-        //{
-        //    sLog.log("More than one reference image found in group ", group.path());
-        //    continue;
-        //}
-
-        //oraz ladujemy liste zdjec
-
+        //ladujemy liste zdjec
         vector<string> imageNames;
         for (auto image : group.getEntries(L"(MWSnap|zdj).*"))
             imageNames.push_back(convert<wstring, string>(image));
 
         ImageOperations op;
-
-
-        //ktore razem z obrazkiem referencyjnym ladujemy do ImageOperations
-        //op.loadReferenceImage(convert<wstring,string>(refimg.front()));	//nie ma juz tego, w ogole nie bedziemy brali od uwage obrazka referencyjnego!
-        
-		//jesli loadVectorOfImages zwraca NIE zero to znaczy ze blad
+		//jesli loadVectorOfImages nie zwraca OK to znaczy ze blad
 		ImageOperations::ImagesErrors loaded = op.loadVectorOfImages(imageNames);
 		if (loaded != op.OK) {
 			//mozemy sprawdzic blad np:
 			if (loaded == ImageOperations::DIFFERENT_SIZES) {
 				sLog.log("obrazki maja rozne wymiary!\n");
+				sLog.close();
 				return 1;
 			}
 		}
 
 		int poczatek = clock();
 		
-        //z ktorymi cos potem robimy (to juz nie moje ;d)
-
-		
-		std::vector<int> threshes;
-		threshes.push_back(10);
-		threshes.push_back(20);
-		threshes.push_back(30);
-		threshes.push_back(40);
+        //szukamy miejsc podejrzanych z roznymi parametrami
+		std::vector<int> threshes = { 10, 20, 30, 40 };
 		op.addRectsWithOptions(7, 3, threshes);
 		op.markAllPossibleCars();
 		
-
-		vector<UMat> mats = op.getLoadedImagesWithPossibleCars();
-		string windowName = "window";
-
 		int czas = clock() - poczatek;
-
 		sLog.log("Tyle czasu zajelo przetwarzanie obrazkow: ", czas);
 
-		//obrazki z zaznaczonymi podejrzanymi miejscami
+		//obrazki z zaznaczonymi podejrzanymi miejscami zapisujemy
+		vector<UMat> mats = op.getLoadedImagesWithPossibleCars();
 		for (decltype(mats.size()) i = 0; i < mats.size(); i++) {
-			//nie pokazuje bo bajzyl sie robi na ekranie
-			//namedWindow(windowName + std::to_string(groupNumber) + "_" + std::to_string(i), WINDOW_AUTOSIZE);
-			//imshow(windowName + std::to_string(groupNumber) + "_" + std::to_string(i), mats[i]);
-
 			std::string gdzie = "./markedCars/obr" + std::to_string(groupNumber) + "_" + std::to_string(i) + ".jpg";
 			imwrite(gdzie, mats[i]);
-
 		}
 
 
 
 		//teraz czas na ann!!!
-		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(36, 28);	//pobieramy obrazki ju¿ przystosowane na wejscie, o takim rozmiarze
+		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(iw, ih);	//pobieramy obrazki ju¿ przystosowane na wejscie, o takim rozmiarze
 
 		//aby obczaiæ obrazki te niby gotowe na sieæ neuronow¹ trzeba daæ tu breakpointa i przejrzeæ wektor wektorów allRects!!!
 
-		
 		//po kolei dla ka¿dego obrazka obczajamy 
 		for (decltype(allRects.size()) i = 0; i < allRects.size(); i++) {
 

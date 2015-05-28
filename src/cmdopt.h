@@ -14,7 +14,8 @@ namespace Opts
     extern std::string imgs_groups_regexp; //="default"
     extern std::string log_file; //="AI.log"
     extern bool log_file_append; //=false
-	extern bool ann_learn; //=true
+	extern bool ann_learn; //=false
+	extern bool ann_tli; //=false
     extern unsigned ann_learn_chunk_size; //=2KB
 
     extern optional<bool> ann_learn_new;

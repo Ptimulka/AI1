@@ -4,11 +4,12 @@ ImageOperations::ImageOperations() {
 	vectorOfImagesLoaded = false;
 }
 
-
 ImageOperations::~ImageOperations() {
-
 }
 
+
+
+//ladowanie obrazkow i wstepne przetwarzanko
 
 ImageOperations::ImagesErrors ImageOperations::loadVectorOfImages(std::vector<std::string> paths) {
 
@@ -72,61 +73,9 @@ ImageOperations::ImagesErrors ImageOperations::loadVectorOfImages(std::vector<st
 	return ImageOperations::OK;
 }
 
-
-ImageOperations::ImagesErrors ImageOperations::loadVectorOfImagesToLearn(std::vector<std::string> paths) {
-
-	learningImages.clear();
-
-	if (paths.size() == 0)
-		return ImageOperations::NO_PATH;
-
-	for (decltype(paths.size()) i = 0; i < paths.size(); i++) {
-		Mat next = imread(paths.at(i), IMREAD_GRAYSCALE);
-		if (next.data == NULL) {
-			return ImageOperations::OPENCV_ERROR;
-		}
-		
-		learningImages.push_back(next);
-	}
-
-	return OK;
+bool ImageOperations::isVectorOfImagesLoaded() {
+	return vectorOfImagesLoaded;
 }
-
-
-
-std::vector<Mat>& ImageOperations::getLearningImagesScaledTo(int width, int height) {
-
-	for (decltype(learningImages.size()) j = 0; j < learningImages.size(); j++) {
-
-		Mat tmp = Mat(height, width, CV_8U);
-		tmp = cv::Scalar(128);	//taki szary pomiedzy czarnym i bia³ym ;)
-
-		if ((double)learningImages[j].rows / learningImages[j].cols >(double)height / width) {
-			//ciemne pasy po lewej i prawej
-			double ratio = (double)height / learningImages[j].rows;
-			Mat resized;
-			int widthAfterResize = (int)(ratio*learningImages[j].cols);
-			resize(learningImages[j], resized, Size(widthAfterResize, height));
-			resized.copyTo(Mat(tmp, Rect((int)((width - widthAfterResize) / 2.0), 0, widthAfterResize, height)));
-		}
-		else {
-
-			double ratio = (double)width / learningImages[j].cols;
-			Mat resized;
-			int heightAfterResize = (int)(ratio*learningImages[j].rows);
-			resize(learningImages[j], resized, Size(width, heightAfterResize));
-			resized.copyTo(Mat(tmp, Rect(0, (int)((height - heightAfterResize) / 2.0), width, heightAfterResize)));
-		}
-
-		learningImages[j] = tmp;
-
-	}
-
-	return learningImages;
-
-}
-
-
 
 void ImageOperations::createMeanImage() {
 
@@ -153,7 +102,7 @@ void ImageOperations::createMeanImage() {
 
 	//musimy stworzyc zwykle Mat, nie UMat, bo inaczej nie dziala mat.at()
 	Mat meanGrayscaleMat = meanImageGrayscale.getMat(ACCESS_RW);
-	std::vector<Mat> maty;		
+	std::vector<Mat> maty;
 	for (decltype(sizeOfVector) i = 0; i < sizeOfVector; i++) {
 		maty.push_back(loadedImagesGrayscale.at(i).getMat(ACCESS_RW));
 	}
@@ -171,7 +120,7 @@ void ImageOperations::createMeanImage() {
 			standardDeviation /= sizeOfVector;
 
 			//najpierw zakladamy ze wszystkie sa ok, tzn ich odchylenie jest ponizej standardowego (co oczywiscie jest raczej niemal niemozliwe)
-			int notSuspected = sizeOfVector;	
+			int notSuspected = sizeOfVector;
 			float averageChanged = average;
 
 			//dla kazdego obrazka sprawdzay piksel na pozycji x,y, czy nie jest podejrzany
@@ -191,7 +140,7 @@ void ImageOperations::createMeanImage() {
 
 			//wpisujemy nowy kolor 
 			meanGrayscaleMat.at<unsigned char>(cv::Point(x, y)) = (unsigned char)averageChanged;
-			
+
 		}
 	}
 
@@ -199,67 +148,13 @@ void ImageOperations::createMeanImage() {
 	return;
 }
 
-
 std::vector<UMat>& ImageOperations::getLoadedImages() {
 	return loadedImages;
 }
 
-std::vector<UMat>& ImageOperations::getLoadedImagesWithPossibleCars() {
-	return loadedImagesWithPossibleCars;
-}
-
-bool ImageOperations::isVectorOfImagesLoaded() {
-	return vectorOfImagesLoaded;
-}
 
 
-
-
-
-void ImageOperations::addRectsWithOptions(int size, int numberOfBlurs, std::vector<int> threshes) {
-
-	Mat meant = meanImageGrayscale.getMat(ACCESS_READ);
-
-	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
-		UMat temp;
-		UMat temp2;
-		temp = imagesDifferences[i].clone();
-
-		for (int j = 0; j < numberOfBlurs; j++)
-			medianBlur(temp, temp, size);
-
-		for (decltype(threshes.size()) k = 0; k < threshes.size(); k++) {
-			cv::threshold(temp, temp2, threshes[k], 255, THRESH_BINARY);	//255 = bia³y
-			Mat temp4 = temp.getMat(ACCESS_READ);
-			Mat temp3 = temp2.getMat(ACCESS_READ);
-			findContoursAddRects(temp2, vectorsOfRectsFound[i]);
-		}
-	}
-
-
-}
-
-
-void ImageOperations::markAllPossibleCars() {
-
-	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
-
-		deleteDuplicatesAddUnions(vectorsOfRectsFound[i], vectorsOfRectsGeneratedByUnions[i]);
-
-		Scalar color = Scalar(0, 140, 255);
-
-		Mat mat = loadedImagesWithPossibleCars[i].getMat(ACCESS_RW);
-		for (decltype(vectorsOfRectsFound[i].size()) j = 0; j < vectorsOfRectsFound[i].size(); j++) 
-			rectangle(mat, vectorsOfRectsFound[i][j], color);		
-
-		for (decltype(vectorsOfRectsGeneratedByUnions[i].size()) j = 0; j < vectorsOfRectsGeneratedByUnions[i].size(); j++) 
-			rectangle(mat, vectorsOfRectsGeneratedByUnions[i][j], color);		
-
-	}
-
-}
-
-
+//przetwarzanko prywatne
 
 void ImageOperations::findContoursAddRects(UMat &mat, std::vector<Rect> &rects) {
 
@@ -284,17 +179,16 @@ void ImageOperations::findContoursAddRects(UMat &mat, std::vector<Rect> &rects) 
 			iter = contours.erase(iter);
 	}
 
-	
+
 	//tworzymy dla ka¿dego konturu prostok¹t i jeœli powierzchnia jest odpowiednia to zachowujemy ten kontur, a prostokat dodajemy do rects
 	for (iter = contours.begin(); iter != contours.end(); iter++) {
 		Rect rect = boundingRect(*iter);
-		if (rect.area() > minArea && rect.area() < 0.25*sizeOfImage.area() && rect.width < 0.5*sizeOfImage.width && rect.height < 0.5*sizeOfImage.height) 
-			rects.push_back(rect);		
+		if (rect.area() > minArea && rect.area() < 0.25*sizeOfImage.area() && rect.width < 0.5*sizeOfImage.width && rect.height < 0.5*sizeOfImage.height && rect.height * 2.5 > rect.width && rect.width*2.5 > rect.height)
+			rects.push_back(rect);
 	}
 
 
 }
-
 
 void ImageOperations::deleteDuplicatesAddUnions(std::vector<Rect> &rects, std::vector<Rect> &rectsUnions) {
 
@@ -327,7 +221,7 @@ void ImageOperations::deleteDuplicatesAddUnions(std::vector<Rect> &rects, std::v
 		std::vector<Rect>::iterator iter2;
 		for (iter2 = iter1 + 1; iter2 != rects.end(); iter2++) {
 
-			Rect intersect = (*iter1) & (*iter2);			
+			Rect intersect = (*iter1) & (*iter2);
 
 			if (intersect.area() > 0.5*(*iter1).area() || intersect.area() > 0.5*(*iter2).area()) {
 				rectsUnions.push_back((*iter1) | (*iter2));		//dodajemy unie
@@ -335,14 +229,116 @@ void ImageOperations::deleteDuplicatesAddUnions(std::vector<Rect> &rects, std::v
 
 		}
 	}
-	
+
 }
 
+
+
+//learning
+
+ImageOperations::ImagesErrors ImageOperations::loadVectorOfImagesToLearn(std::vector<std::string> paths) {
+
+	learningImages.clear();
+
+	if (paths.size() == 0)
+		return ImageOperations::NO_PATH;
+
+	for (decltype(paths.size()) i = 0; i < paths.size(); i++) {
+		Mat next = imread(paths.at(i), IMREAD_GRAYSCALE);
+		if (next.data == NULL) {
+			return ImageOperations::OPENCV_ERROR;
+		}
+		
+		learningImages.push_back(next);
+	}
+
+	return OK;
+}
+
+std::vector<Mat>& ImageOperations::getLearningImagesScaledTo(int width, int height) {
+
+	for (decltype(learningImages.size()) j = 0; j < learningImages.size(); j++) {
+
+		Mat tmp = Mat(height, width, CV_8U);
+		tmp = cv::Scalar(128);	//taki szary pomiedzy czarnym i bia³ym ;)
+
+		
+
+		if ((double)learningImages[j].rows / learningImages[j].cols >(double)height / width) {
+			//ciemne pasy po lewej i prawej
+			double ratio = (double)height / learningImages[j].rows;
+			Mat resized;
+			int widthAfterResize = (int)(ratio*learningImages[j].cols);
+			resize(learningImages[j], resized, Size(widthAfterResize, height));
+			resized.copyTo(Mat(tmp, Rect((int)((width - widthAfterResize) / 2.0), 0, widthAfterResize, height)));
+		}
+		else {
+
+			double ratio = (double)width / learningImages[j].cols;
+			Mat resized;
+			int heightAfterResize = (int)(ratio*learningImages[j].rows);
+			resize(learningImages[j], resized, Size(width, heightAfterResize));
+			resized.copyTo(Mat(tmp, Rect(0, (int)((height - heightAfterResize) / 2.0), width, heightAfterResize)));
+		}
+
+		learningImages[j] = tmp;
+
+	}
+
+	return learningImages;
+
+}
+
+
+
+//dodawanko prostokatow, ustalanie prostokata jako auto, zaznaczanie prostokatow
+
+void ImageOperations::addRectsWithOptions(int size, int numberOfBlurs, std::vector<int> threshes) {
+
+	Mat meant = meanImageGrayscale.getMat(ACCESS_READ);
+
+	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
+		UMat temp;
+		UMat temp2;
+		temp = imagesDifferences[i].clone();
+
+		for (int j = 0; j < numberOfBlurs; j++)
+			medianBlur(temp, temp, size);
+
+		for (decltype(threshes.size()) k = 0; k < threshes.size(); k++) {
+			cv::threshold(temp, temp2, threshes[k], 255, THRESH_BINARY);	//255 = bia³y
+			Mat temp4 = temp.getMat(ACCESS_READ);
+			Mat temp3 = temp2.getMat(ACCESS_READ);
+			findContoursAddRects(temp2, vectorsOfRectsFound[i]);
+		}
+	}
+
+
+}
+
+void ImageOperations::markAllPossibleCars() {
+
+	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
+
+		deleteDuplicatesAddUnions(vectorsOfRectsFound[i], vectorsOfRectsGeneratedByUnions[i]);
+
+		Scalar color = Scalar(0, 140, 255);
+
+		Mat mat = loadedImagesWithPossibleCars[i].getMat(ACCESS_RW);
+		for (decltype(vectorsOfRectsFound[i].size()) j = 0; j < vectorsOfRectsFound[i].size(); j++) 
+			rectangle(mat, vectorsOfRectsFound[i][j], color);		
+
+		for (decltype(vectorsOfRectsGeneratedByUnions[i].size()) j = 0; j < vectorsOfRectsGeneratedByUnions[i].size(); j++) 
+			rectangle(mat, vectorsOfRectsGeneratedByUnions[i][j], color);		
+
+	}
+
+}
 
 std::vector<std::vector<Mat>>& ImageOperations::getMatsScaledTo(int width, int height) {
 
 
-	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {		
+	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
 
 		std::vector<Mat> toAdd;
 		Mat noUMat = loadedImagesGrayscale[i].getMat(ACCESS_READ);
@@ -352,7 +348,12 @@ std::vector<std::vector<Mat>>& ImageOperations::getMatsScaledTo(int width, int h
 			Mat tmp = Mat(height, width, CV_8U);
 			tmp = cv::Scalar(128);	//taki szary pomiedzy czarnym i bia³ym ;)
 
-			if ((double)vectorsOfRectsFound[i][j].height / vectorsOfRectsFound[i][j].width > (double)height / width) {
+
+			if (i == 1 && j == 27) {
+				std::cout << "ooo!\n";
+			}
+
+			if ((double)vectorsOfRectsFound[i][j].height / vectorsOfRectsFound[i][j].width >(double)height / width) {
 				//ciemne pasy po lewej i prawej
 				double ratio = (double)height / vectorsOfRectsFound[i][j].height;
 				Mat resized;
@@ -384,11 +385,9 @@ std::vector<std::vector<Mat>>& ImageOperations::getMatsScaledTo(int width, int h
 	return rectsChangedForAnn;
 }
 
-
 void ImageOperations::setRectAsCar(uint image, uint rect) {
 	rectsSetAsCars[image].push_back(rect);
 }
-
 
 void ImageOperations::markRealCars() {
 
@@ -396,12 +395,16 @@ void ImageOperations::markRealCars() {
 
 	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
 		Mat mat = loadedImagesWithPossibleCars[i].getMat(ACCESS_RW);
-		
+
 		for (decltype(rectsSetAsCars[i].size()) j = 0; j < rectsSetAsCars[i].size(); j++) {
 			rectangle(mat, vectorsOfRectsFound[i][rectsSetAsCars[i][j]], color);
 		}
 
 	}
+}
+
+std::vector<UMat>& ImageOperations::getLoadedImagesWithPossibleCars() {
+	return loadedImagesWithPossibleCars;
 }
 
 

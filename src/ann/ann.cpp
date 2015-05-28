@@ -245,8 +245,8 @@ void ArtificialNeuralNetwork::learn(vector<float> tests, vector<float> results)
 
     for (uint i = 0; i < d->data->num_data; ++i)
     {
-        memcpy(d->data->input[i], tests.data() + d->data->num_input*i, d->data->num_input);
-        memcpy(d->data->output[i], results.data() + d->data->num_output*i, d->data->num_output);
+        memcpy(d->data->input[i], tests.data() + d->data->num_input*i, d->data->num_input*sizeof(float));
+		memcpy(d->data->output[i], results.data() + d->data->num_output*i, d->data->num_output*sizeof(float));
     }
 
     fann_train_on_data(d->ann, d->data, 5000, 500, 0.0001f);

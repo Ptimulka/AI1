@@ -11,6 +11,7 @@ namespace Opts
     std::string log_file = "AI.log"; //nazwa logu (patrz main.cpp)
     bool log_file_append = false; //czy dopisujemy (patrz main.cpp)
 	bool ann_learn = false; //czy uruchamiamy program aby uczyæ sieæ
+	bool ann_tli = false;	//czy uruchamiamy program aby sprawdzic czy dla danych uczacych siec zwraca spoko wyniczki
     unsigned ann_learn_chunk_size = 2 * 1024 * 1024;
     optional<bool> ann_learn_new;
     optional<string> ann_file;
@@ -68,9 +69,16 @@ namespace
 	static CmdOpt ann_learn(
 		StringList({ "ann-learning" }),
 		"Specifies if ann should learn.\n"
-		"Default: true",
+		"Default: false",
 		0, 1,
 		CMDLINE_ASSIGMENT_HANDLER(Opts::ann_learn));
+
+	static CmdOpt ann_tli(
+		StringList({ "ann-tli" }),
+		"Specifies if ann should be loaded and give results for learning images.\n"
+		"Default: false",
+		0, 1,
+		CMDLINE_ASSIGMENT_HANDLER(Opts::ann_tli));
 
     static CmdOpt ann_learn_chunk_size(
         StringList({ "learn-chunk" }),
