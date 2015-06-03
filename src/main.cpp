@@ -318,6 +318,10 @@ int main(int argc, char** argv)
                 auto result = ann.run(array).front();
 				results.push_back(result);
 
+				//zapis do pliku
+				std::string gdzie = "./allRects/obr" + std::to_string(groupNumber) + "_" + std::to_string(i) + "_" + std::to_string(j) + "__" + std::to_string(result) + ".jpg";
+				imwrite(gdzie, allRects[i][j]);
+
 				//odpowiedŸ sieci
 				if (result > Opts::ann_accept_threshold) {
 					op.setRectAsCar(i, j);
