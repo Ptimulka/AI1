@@ -28,6 +28,7 @@ private:
 
 	std::vector<std::vector<Rect>> vectorsOfRectsFound;
 	std::vector<std::vector<Rect>> vectorsOfRectsGeneratedByUnions;
+	std::vector<std::vector<Rect>> vectorsOfRectsAll;
 	std::vector<std::vector<uint>> rectsSetAsCars;
 	std::vector<std::vector<Mat>> rectsChangedForAnn;
 

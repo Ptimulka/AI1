@@ -87,6 +87,9 @@
     <ClCompile Include="..\..\src\ann\ann.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\annlearn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\utils\cmdline.h">
@@ -145,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\ann\cl\oclcontext.h">
       <Filter>Header Files\ann\cl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\annlearn.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -67,6 +67,7 @@ ImageOperations::ImagesErrors ImageOperations::loadVectorOfImages(std::vector<st
 		//tworzymy tez wektory na prostokaty
 		vectorsOfRectsFound.push_back(std::vector<Rect>());
 		vectorsOfRectsGeneratedByUnions.push_back(std::vector<Rect>());
+		vectorsOfRectsAll.push_back(std::vector<Rect>());
 
 	}
 
@@ -97,6 +98,7 @@ void ImageOperations::createMeanImage() {
 	//musimy zamienic na nie float
 	meanImageGrayscale.convertTo(meanImageGrayscale, CV_8U);
 
+	Mat dopod = meanImageGrayscale.getMat(ACCESS_READ);
 
 	//a teraz algorytm wyrzucania tych z wiekszym odchyleniem niz odchylenie standardowym
 
@@ -273,7 +275,7 @@ std::vector<Mat>& ImageOperations::getLearningImagesScaledTo(int width, int heig
 			resized.copyTo(Mat(tmp, Rect((int)((width - widthAfterResize) / 2.0), 0, widthAfterResize, height)));
 		}
 		else {
-
+			//a tu u góry i na dole
 			double ratio = (double)width / learningImages[j].cols;
 			Mat resized;
 			int heightAfterResize = (int)(ratio*learningImages[j].rows);
@@ -322,14 +324,17 @@ void ImageOperations::markAllPossibleCars() {
 
 		deleteDuplicatesAddUnions(vectorsOfRectsFound[i], vectorsOfRectsGeneratedByUnions[i]);
 
+		//³¹czymy te pocz¹tkowo znalezione z tymi wygenerowanymi w jeden wektor
+		vectorsOfRectsAll[i].reserve(vectorsOfRectsFound[i].size() + vectorsOfRectsGeneratedByUnions[i].size()); // preallocate memory
+		vectorsOfRectsAll[i].insert(vectorsOfRectsAll[i].end(), vectorsOfRectsFound[i].begin(), vectorsOfRectsFound[i].end());
+		vectorsOfRectsAll[i].insert(vectorsOfRectsAll[i].end(), vectorsOfRectsGeneratedByUnions[i].begin(), vectorsOfRectsGeneratedByUnions[i].end());
+
+
 		Scalar color = Scalar(0, 140, 255);
 
 		Mat mat = loadedImagesWithPossibleCars[i].getMat(ACCESS_RW);
-		for (decltype(vectorsOfRectsFound[i].size()) j = 0; j < vectorsOfRectsFound[i].size(); j++) 
-			rectangle(mat, vectorsOfRectsFound[i][j], color);		
-
-		for (decltype(vectorsOfRectsGeneratedByUnions[i].size()) j = 0; j < vectorsOfRectsGeneratedByUnions[i].size(); j++) 
-			rectangle(mat, vectorsOfRectsGeneratedByUnions[i][j], color);		
+		for (decltype(vectorsOfRectsAll[i].size()) j = 0; j < vectorsOfRectsAll[i].size(); j++) 
+			rectangle(mat, vectorsOfRectsAll[i][j], color);		
 
 	}
 
@@ -343,30 +348,25 @@ std::vector<std::vector<Mat>>& ImageOperations::getMatsScaledTo(int width, int h
 		std::vector<Mat> toAdd;
 		Mat noUMat = loadedImagesGrayscale[i].getMat(ACCESS_READ);
 
-		for (decltype(vectorsOfRectsFound[i].size()) j = 0; j < vectorsOfRectsFound[i].size(); j++) {
+		for (decltype(vectorsOfRectsAll[i].size()) j = 0; j < vectorsOfRectsAll[i].size(); j++) {
 
 			Mat tmp = Mat(height, width, CV_8U);
 			tmp = cv::Scalar(128);	//taki szary pomiedzy czarnym i bia³ym ;)
 
-
-			if (i == 1 && j == 27) {
-				std::cout << "ooo!\n";
-			}
-
-			if ((double)vectorsOfRectsFound[i][j].height / vectorsOfRectsFound[i][j].width >(double)height / width) {
+			if ((double)vectorsOfRectsAll[i][j].height / vectorsOfRectsAll[i][j].width >(double)height / width) {
 				//ciemne pasy po lewej i prawej
-				double ratio = (double)height / vectorsOfRectsFound[i][j].height;
+				double ratio = (double)height / vectorsOfRectsAll[i][j].height;
 				Mat resized;
-				int widthAfterResize = (int)(ratio*vectorsOfRectsFound[i][j].width);
-				resize(Mat(noUMat, vectorsOfRectsFound[i][j]), resized, Size(widthAfterResize, height));
+				int widthAfterResize = (int)(ratio*vectorsOfRectsAll[i][j].width);
+				resize(Mat(noUMat, vectorsOfRectsAll[i][j]), resized, Size(widthAfterResize, height));
 				resized.copyTo(Mat(tmp, Rect((int)((width - widthAfterResize) / 2.0), 0, widthAfterResize, height)));
 			}
 			else {
-
-				double ratio = (double)width / vectorsOfRectsFound[i][j].width;
+				//a tu u góry i na dole
+				double ratio = (double)width / vectorsOfRectsAll[i][j].width;
 				Mat resized;
-				int heightAfterResize = (int)(ratio*vectorsOfRectsFound[i][j].height);
-				resize(Mat(noUMat, vectorsOfRectsFound[i][j]), resized, Size(width, heightAfterResize));
+				int heightAfterResize = (int)(ratio*vectorsOfRectsAll[i][j].height);
+				resize(Mat(noUMat, vectorsOfRectsAll[i][j]), resized, Size(width, heightAfterResize));
 				resized.copyTo(Mat(tmp, Rect(0, (int)((height - heightAfterResize) / 2.0), width, heightAfterResize)));
 			}
 
@@ -376,9 +376,9 @@ std::vector<std::vector<Mat>>& ImageOperations::getMatsScaledTo(int width, int h
 
 		rectsChangedForAnn.push_back(toAdd);
 
-		//takie tam
-		std::vector < uint > temp;
-		rectsSetAsCars.push_back(temp);
+		//przyda nam sie przy ustalaniu któe s¹ samochodami a które nie
+		std::vector < uint > setAsCars;
+		rectsSetAsCars.push_back(setAsCars);
 
 	}
 
@@ -397,7 +397,7 @@ void ImageOperations::markRealCars() {
 		Mat mat = loadedImagesWithPossibleCars[i].getMat(ACCESS_RW);
 
 		for (decltype(rectsSetAsCars[i].size()) j = 0; j < rectsSetAsCars[i].size(); j++) {
-			rectangle(mat, vectorsOfRectsFound[i][rectsSetAsCars[i][j]], color);
+			rectangle(mat, vectorsOfRectsAll[i][rectsSetAsCars[i][j]], color);
 		}
 
 	}

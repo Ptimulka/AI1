@@ -148,6 +148,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\annlearn.cpp" />
     <ClCompile Include="..\..\src\ann\ann.cpp" />
     <ClCompile Include="..\..\src\ann\cl\oclcontext.cpp" />
     <ClCompile Include="..\..\src\ann\cl\ocldevice.cpp" />
@@ -166,6 +167,7 @@
     <ClCompile Include="..\..\src\utils\log.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\annlearn.h" />
     <ClInclude Include="..\..\src\ann\cl\oclcontext.h" />
     <ClInclude Include="..\..\src\ann\cl\ocldevice.h" />
     <ClInclude Include="..\..\src\ann\cl\oclkernel.h" />
