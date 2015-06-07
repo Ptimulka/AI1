@@ -60,11 +60,12 @@ int main(int argc, char** argv)
     
 
 
-	uint iw = 40, ih = 27;	//image width, height
-	const char *filename = "test40x27_+11_+11.ann";	//pod jak¹ nazw¹ zapisaæ nauczon¹ sieæ
+	uint iw = 50, ih = 20;	//image width, height
+	const char *filename = "test50x20.ann";	//pod jak¹ nazw¹ zapisaæ nauczon¹ sieæ
 
 	///////------UCZENIE SIECIUNI!!!!---------\\\\\\\\	
-	if (Opts::ann_learn) {		
+	if (Opts::ann_learn) {	
+        //-ann-learning
         ann_learn(iw, ih, filename, iw*ih / 2);	//wysokosæ, szerokoœæ, nazwa pliku w którym zapisaæ sieæ, iloœæ neuronów w 1. warstwie ukrytej, potem 2. ukrytej - domyœlnie 0
 		sLog.close();
 		return 0;
@@ -72,6 +73,7 @@ int main(int argc, char** argv)
 
 	////////   TUTAJ SPRAWDZANKO CZY NAUCZONA SIEC ZWRACA SPOKO WYNIKI DLA DANYCH UCZACYCH!!!
 	if (Opts::ann_tli) {
+        //-ann-tli
 		ann_test_learning_images(iw, ih, filename, 0.85);		
 		sLog.close();
 		return 0;
