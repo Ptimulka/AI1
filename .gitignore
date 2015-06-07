@@ -10,8 +10,8 @@ bin/*/*/*/*.log
 project/*/tmp/*
 bin/working_dir/*.log
 bin/working_dir/allRects/*
-bin/working_dir/makredCars/*
-bin/working_dir/makredCarsAnn/*
+bin/working_dir/markedCars/*
+bin/working_dir/markedCarsAnn/*
 
 # część domyślna
 
