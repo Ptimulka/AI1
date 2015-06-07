@@ -249,7 +249,7 @@ void ArtificialNeuralNetwork::learn(vector<float> tests, vector<float> results)
 		memcpy(d->data->output[i], results.data() + d->data->num_output*i, d->data->num_output*sizeof(float));
     }
 
-    fann_train_on_data(d->ann, d->data, 5000, 500, 0.0001f);
+    fann_train_on_data(d->ann, d->data, 2000, 100, 0.0001f);
     d->fetchWeights(weights, layers);
 	d->data->num_data = old_data;
 }
