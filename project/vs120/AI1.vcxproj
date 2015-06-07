@@ -155,9 +155,6 @@
     <ClCompile Include="..\..\src\ann\cl\oclkernel.cpp" />
     <ClCompile Include="..\..\src\ann\cl\oclmgr.cpp" />
     <ClCompile Include="..\..\src\ann\cl\oclplatform.cpp" />
-    <ClCompile Include="..\..\src\ann\cl\som.cpp" />
-    <ClCompile Include="..\..\src\ann\fann_irprop_logical.cpp" />
-    <ClCompile Include="..\..\src\ann\simple_ann.cpp" />
     <ClCompile Include="..\..\src\cmdopt.cpp" />
     <ClCompile Include="..\..\src\debug.cpp" />
     <ClCompile Include="..\..\src\ImageOperations.cpp" />
@@ -187,10 +184,6 @@
     <ClInclude Include="..\..\src\utils\singleton.h" />
     <ClInclude Include="..\..\src\utils\stringlist.h" />
     <ClInclude Include="..\..\src\utils\strutils.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\src\ann\cl\ffann_irpropp_logicf.cl" />
-    <None Include="..\..\src\ann\cl\som.cl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

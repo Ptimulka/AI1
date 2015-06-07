@@ -10,7 +10,6 @@
 #include "utils/strutils.h"
 #include "io/dir.h"
 #include "ann/cl/oclkernel.h"
-#include "ann/fann_irprop_logical.h"
 #include "ann/ann.h"
 #include "annlearn.h"
 
@@ -66,7 +65,7 @@ int main(int argc, char** argv)
 
 	///////------UCZENIE SIECIUNI!!!!---------\\\\\\\\	
 	if (Opts::ann_learn) {		
-		ann_learn(iw, ih, filename, iw-3);	//wysokosæ, szerokoœæ, nazwa pliku w którym zapisaæ sieæ, iloœæ neuronów w 1. warstwie ukrytej, potem 2. ukrytej - domyœlnie 0
+        ann_learn(iw, ih, filename, iw*ih + 9);	//wysokosæ, szerokoœæ, nazwa pliku w którym zapisaæ sieæ, iloœæ neuronów w 1. warstwie ukrytej, potem 2. ukrytej - domyœlnie 0
 		sLog.close();
 		return 0;
 	}

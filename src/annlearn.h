@@ -10,7 +10,7 @@
 #include "utils/strutils.h"
 #include "io/dir.h"
 #include "ann/cl/oclkernel.h"
-#include "ann/fann_irprop_logical.h"
+
 #include "ann/ann.h"
 
 using namespace std;
