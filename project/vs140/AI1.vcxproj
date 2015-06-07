@@ -148,15 +148,13 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\annlearn.cpp" />
     <ClCompile Include="..\..\src\ann\ann.cpp" />
     <ClCompile Include="..\..\src\ann\cl\oclcontext.cpp" />
     <ClCompile Include="..\..\src\ann\cl\ocldevice.cpp" />
     <ClCompile Include="..\..\src\ann\cl\oclkernel.cpp" />
     <ClCompile Include="..\..\src\ann\cl\oclmgr.cpp" />
     <ClCompile Include="..\..\src\ann\cl\oclplatform.cpp" />
-    <ClCompile Include="..\..\src\ann\cl\som.cpp" />
-    <ClCompile Include="..\..\src\ann\fann_irprop_logical.cpp" />
-    <ClCompile Include="..\..\src\ann\simple_ann.cpp" />
     <ClCompile Include="..\..\src\cmdopt.cpp" />
     <ClCompile Include="..\..\src\debug.cpp" />
     <ClCompile Include="..\..\src\ImageOperations.cpp" />
@@ -166,6 +164,7 @@
     <ClCompile Include="..\..\src\utils\log.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\annlearn.h" />
     <ClInclude Include="..\..\src\ann\ann.h" />
     <ClInclude Include="..\..\src\ann\cl\oclcontext.h" />
     <ClInclude Include="..\..\src\ann\cl\ocldevice.h" />
@@ -173,7 +172,6 @@
     <ClInclude Include="..\..\src\ann\cl\oclmgr.h" />
     <ClInclude Include="..\..\src\ann\cl\oclplatform.h" />
     <ClInclude Include="..\..\src\ann\cl\som.h" />
-    <ClInclude Include="..\..\src\ann\fann_irprop_logical.h" />
     <ClInclude Include="..\..\src\ann\simple_ann.h" />
     <ClInclude Include="..\..\src\cmdopt.h" />
     <ClInclude Include="..\..\src\ImageOperations.h" />

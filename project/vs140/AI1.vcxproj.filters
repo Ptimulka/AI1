@@ -60,9 +60,6 @@
     <ClCompile Include="..\..\src\debug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ann\simple_ann.cpp">
-      <Filter>Source Files\ann</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\ann\cl\ocldevice.cpp">
       <Filter>Source Files\ann\cl</Filter>
     </ClCompile>
@@ -72,20 +69,17 @@
     <ClCompile Include="..\..\src\ann\cl\oclplatform.cpp">
       <Filter>Source Files\ann\cl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ann\cl\som.cpp">
-      <Filter>Source Files\ann\cl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\ann\cl\oclmgr.cpp">
       <Filter>Source Files\ann\cl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ann\cl\oclcontext.cpp">
       <Filter>Source Files\ann\cl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ann\fann_irprop_logical.cpp">
-      <Filter>Source Files\ann</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\ann\ann.cpp">
       <Filter>Source Files\ann</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\annlearn.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -146,14 +140,14 @@
     <ClInclude Include="..\..\src\ann\cl\oclcontext.h">
       <Filter>Header Files\ann\cl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\ann\fann_irprop_logical.h">
-      <Filter>Source Files\ann</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\ann\ann.h">
       <Filter>Header Files\ann</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\utils\vectorn.h">
       <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\annlearn.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

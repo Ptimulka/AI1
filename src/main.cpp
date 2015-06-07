@@ -60,12 +60,12 @@ int main(int argc, char** argv)
     
 
 
-	uint iw = 20, ih = 14;	//image with, height
-	const char *filename = "test.ann";	//pod jak¹ nazw¹ zapisaæ nauczon¹ sieæ
+	uint iw = 40, ih = 27;	//image width, height
+	const char *filename = "test40x27_+11_+11.ann";	//pod jak¹ nazw¹ zapisaæ nauczon¹ sieæ
 
 	///////------UCZENIE SIECIUNI!!!!---------\\\\\\\\	
 	if (Opts::ann_learn) {		
-        ann_learn(iw, ih, filename, iw*ih + 9);	//wysokosæ, szerokoœæ, nazwa pliku w którym zapisaæ sieæ, iloœæ neuronów w 1. warstwie ukrytej, potem 2. ukrytej - domyœlnie 0
+        ann_learn(iw, ih, filename, iw*ih / 2);	//wysokosæ, szerokoœæ, nazwa pliku w którym zapisaæ sieæ, iloœæ neuronów w 1. warstwie ukrytej, potem 2. ukrytej - domyœlnie 0
 		sLog.close();
 		return 0;
 	}
