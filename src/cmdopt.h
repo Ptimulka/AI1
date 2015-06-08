@@ -24,5 +24,11 @@ namespace Opts
     extern optional<std::string> ocl_try_compile;
 
     extern float ann_accept_threshold;
+
+	extern unsigned int iw;
+	extern unsigned int ih;
+	extern unsigned int nodes_in_hidden1;
+	extern unsigned int nodes_in_hidden2;
+	extern std::string imgs_learn;
 }
 
