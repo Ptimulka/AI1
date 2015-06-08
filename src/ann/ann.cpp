@@ -321,7 +321,7 @@ void ArtificialNeuralNetwork::_initFann(std::string const& loadfromfile, uint tr
 	fann_get_layer_array(_driver->ann, l);
 	layers.assign(l, l + lcount);
 	weights.resize(getConnectionsCount());
-	_driver->fetchWeights(weights, layers);
+	//_driver->fetchWeights(weights, layers);
 
 	driver = _driver;
 }

@@ -79,7 +79,10 @@ public:
 	void markAllPossibleCars();
 
 	//pobranie wszystkich prostokatow juz jako Maty (wycinki szarych obrazkow)
-	std::vector<std::vector<Mat>>& getMatsScaledTo(int width, int height);
+	Mat getMatScaledTo(int obrazek, int podobrazek, int width, int height);
+
+    inline auto getImagesCount() const { return loadedImages.size(); }
+    inline auto getRectsCountForImage(int img) const { return vectorsOfRectsAll[img].size(); }
 
 	//zapamietanie ze j-ty prostokat i-tego obrazka jest samochodem
 	void setRectAsCar(uint image, uint rect);

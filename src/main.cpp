@@ -83,13 +83,29 @@ int main(int argc, char** argv)
 
     if (!Opts::ann_file.isSet())
     {
-        sLog.log("Ann file not specified - using 'default.ann'");
-        Opts::ann_file = string("default.ann");
+        sLog.log("Ann file not specified - using '.*\\.ann'");
+        Opts::ann_file = string(".*\\.ann");
     }
 
-    ArtificialNeuralNetwork ann;
-    ann.init<ArtificialNeuralNetwork::FannDriver>(filename, 0u);
-    
+    uint ann_idx = 0;
+    std::list<ArtificialNeuralNetwork> anns;
+    auto entries = Dir(L"anns").getEntries(convert<string, wstring>(Opts::ann_file));
+    for (auto& file : entries)
+    {
+        ArtificialNeuralNetwork ann;
+        ann.init<ArtificialNeuralNetwork::FannDriver>(convert<wstring,string>(file).c_str(), 0u);
+
+        int width, height;
+        istringstream ss(convert<wstring, string>(file.substr(file.rfind('/')+1)));
+        string tmp;
+        getline(ss, tmp, '.'); width = parse<int>(tmp);
+        getline(ss, tmp, '.'); height = parse<int>(tmp);
+        ann.setInputSize(width, height);
+
+        anns.push_back(ann);
+        sLog.log("Loaded ann: ", file, " ", ++ann_idx, "/", entries.size());
+    }
+
     wregex group_regexp(convert<string,wstring>(Opts::imgs_groups_regexp));
     Dir imgs_dir(convert<string, wstring>(Opts::imgs_dir));
 
@@ -118,6 +134,7 @@ int main(int argc, char** argv)
 			return 1;
 		}
 
+        sLog.log("Group ", group.name(), " (", imageNames.size(), " images)");
 		
         //szukamy miejsc podejrzanych z roznymi parametrami
 		std::vector<int> threshes = { 10, 20, 30, 40 };
@@ -132,22 +149,19 @@ int main(int argc, char** argv)
 		}
 
 		//teraz czas na ann!!!
-		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(Opts::iw, Opts::ih);	//pobieramy obrazki ju¿ przystosowane na wejscie
+        for (int i = 0; i < op.getImagesCount(); i++) {
 
-		for (decltype(allRects.size()) i = 0; i < allRects.size(); i++) {
-
-			vector<float> results;
-			for (decltype(allRects[i].size()) j = 0; j < allRects[i].size(); j++) {
+            sLog.log("Testing image: ", i+1, "/", op.getImagesCount(), ", ", op.getRectsCountForImage(i), " possible rects");
+            for (int j = 0; j < op.getRectsCountForImage(i); j++) {
 
 				std::vector<float> array;
-				array.assign(allRects[i][j].datastart, allRects[i][j].dataend);
-
-                auto result = ann.run(array).front();
-				results.push_back(result);
-
-				//zapis do pliku
-				std::string gdzie = "./allRects/obr" + std::to_string(groupNumber) + "_" + std::to_string(i) + "_" + std::to_string(j) + "__" + std::to_string(result) + ".jpg";
-				imwrite(gdzie, allRects[i][j]);
+                float result = 0.0;
+                for (auto& ann : anns)
+                {
+                    auto scaled = op.getMatScaledTo(i, j, ann.getInputWidth(), ann.getInputHeight());
+                    array.assign(scaled.datastart, scaled.dataend);
+                    result = max(result, ann.run(array).front());
+                }
 
 				//jeœli odpowiedŸ sieci jes na tyle duza aby uznaæ prostok¹t za samochód, to ustawiamy ¿e to jest samochód
 				if (result > Opts::ann_accept_threshold) {

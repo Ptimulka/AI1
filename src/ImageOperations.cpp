@@ -340,58 +340,45 @@ void ImageOperations::markAllPossibleCars() {
 
 }
 
-std::vector<std::vector<Mat>>& ImageOperations::getMatsScaledTo(int width, int height) {
+Mat ImageOperations::getMatScaledTo(int obrazek, int podobrazek, int width, int height) {
+	std::vector<Mat> toAdd;
+	Mat noUMat = loadedImagesGrayscale[obrazek].getMat(ACCESS_READ);
+    Mat tmp = Mat(height, width, CV_8U);
+    tmp = cv::Scalar(128);	//taki szary pomiedzy czarnym i bia³ym ;)
+    cv::Rect wycinek = vectorsOfRectsAll[obrazek][podobrazek];
 
+    if ((double)wycinek.height / wycinek.width >(double)height / width) {
+        //ciemne pasy po lewej i prawej
+        double ratio = (double)height / wycinek.height;
+        Mat resized;
+        int widthAfterResize = (int)(ratio*wycinek.width);
+        resize(Mat(noUMat, wycinek), resized, Size(widthAfterResize, height));
+        resized.copyTo(Mat(tmp, Rect((int)((width - widthAfterResize) / 2.0), 0, widthAfterResize, height)));
+    }
+    else {
+        //a tu u góry i na dole
+        double ratio = (double)width / wycinek.width;
+        Mat resized;
+        int heightAfterResize = (int)(ratio*wycinek.height);
+        resize(Mat(noUMat, wycinek), resized, Size(width, heightAfterResize));
+        resized.copyTo(Mat(tmp, Rect(0, (int)((height - heightAfterResize) / 2.0), width, heightAfterResize)));
+    }
 
-	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
-
-		std::vector<Mat> toAdd;
-		Mat noUMat = loadedImagesGrayscale[i].getMat(ACCESS_READ);
-
-		for (decltype(vectorsOfRectsAll[i].size()) j = 0; j < vectorsOfRectsAll[i].size(); j++) {
-
-			Mat tmp = Mat(height, width, CV_8U);
-			tmp = cv::Scalar(128);	//taki szary pomiedzy czarnym i bia³ym ;)
-
-			if ((double)vectorsOfRectsAll[i][j].height / vectorsOfRectsAll[i][j].width >(double)height / width) {
-				//ciemne pasy po lewej i prawej
-				double ratio = (double)height / vectorsOfRectsAll[i][j].height;
-				Mat resized;
-				int widthAfterResize = (int)(ratio*vectorsOfRectsAll[i][j].width);
-				resize(Mat(noUMat, vectorsOfRectsAll[i][j]), resized, Size(widthAfterResize, height));
-				resized.copyTo(Mat(tmp, Rect((int)((width - widthAfterResize) / 2.0), 0, widthAfterResize, height)));
-			}
-			else {
-				//a tu u góry i na dole
-				double ratio = (double)width / vectorsOfRectsAll[i][j].width;
-				Mat resized;
-				int heightAfterResize = (int)(ratio*vectorsOfRectsAll[i][j].height);
-				resize(Mat(noUMat, vectorsOfRectsAll[i][j]), resized, Size(width, heightAfterResize));
-				resized.copyTo(Mat(tmp, Rect(0, (int)((height - heightAfterResize) / 2.0), width, heightAfterResize)));
-			}
-
-
-			toAdd.push_back(tmp);
-		}
-
-		rectsChangedForAnn.push_back(toAdd);
-
-		//przyda nam sie przy ustalaniu któe s¹ samochodami a które nie
-		std::vector < uint > setAsCars;
-		rectsSetAsCars.push_back(setAsCars);
-
-	}
-
-	return rectsChangedForAnn;
+    return tmp;
 }
 
 void ImageOperations::setRectAsCar(uint image, uint rect) {
+    if (rectsSetAsCars.empty())
+        rectsSetAsCars.resize(loadedImages.size(), std::vector<uint>());
+
 	rectsSetAsCars[image].push_back(rect);
 }
 
 void ImageOperations::markRealCars() {
 
 	Scalar color = Scalar(0, 255, 10);
+    if (rectsSetAsCars.empty())
+        rectsSetAsCars.resize(loadedImages.size(), std::vector<uint>());
 
 	for (decltype(loadedImages.size()) i = 0; i < loadedImages.size(); ++i) {
 		Mat mat = loadedImagesWithPossibleCars[i].getMat(ACCESS_RW);

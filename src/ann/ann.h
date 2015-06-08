@@ -59,11 +59,19 @@ public:
     void save(std::ostream& out) const;
 	void saveNative(std::string const& filename) const;
 
+    inline auto getInputWidth() const { return in_width; }
+    inline auto getInputHeight() const { return in_height; }
+
+    inline void setInputSize(int w, int h) { in_width = w; in_height = h; }
+
 private:
     void* driver;
 
     std::vector<uint> layers;
     std::vector<float> weights;
+
+    unsigned in_width = 0;
+    unsigned in_height = 0;
 
     void _initFann(uint trains);
 	void _initFann(std::string const& loadfromfile, uint trains);
