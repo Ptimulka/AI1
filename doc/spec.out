@@ -4,8 +4,10 @@
 \BOOKMARK [2][-]{subsection.1.3}{Analiza istniejących rozwiązań}{section.1}% 4
 \BOOKMARK [1][-]{section.2}{Koncepcje rozwiązania problemu}{}% 5
 \BOOKMARK [2][-]{subsection.2.1}{Rozwiązanie wstępne}{section.2}% 6
-\BOOKMARK [2][-]{subsection.2.2}{Plan\040ew.\040rozbudowy\040projektu}{section.2}% 7
-\BOOKMARK [1][-]{section.3}{Problemy\040implementacyjne}{}% 8
-\BOOKMARK [2][-]{subsection.3.1}{Wybór języka programowania}{section.3}% 9
-\BOOKMARK [2][-]{subsection.3.2}{Biblioteki}{section.3}% 10
-\BOOKMARK [2][-]{subsection.3.3}{Sieć neuronowa}{section.3}% 11
+\BOOKMARK [1][-]{section.3}{Problemy\040implementacyjne}{}% 7
+\BOOKMARK [2][-]{subsection.3.1}{Wybór języka programowania}{section.3}% 8
+\BOOKMARK [2][-]{subsection.3.2}{Biblioteki}{section.3}% 9
+\BOOKMARK [2][-]{subsection.3.3}{Sieć neuronowa}{section.3}% 10
+\BOOKMARK [1][-]{section.4}{Aplikacja\040-\040wyniki\040i\040testowanie}{}% 11
+\BOOKMARK [2][-]{subsection.4.1}{Przykładowe dane wejściowe i wyniki}{section.4}% 12
+\BOOKMARK [2][-]{subsection.4.2}{Podsumowanie\040realizacji}{section.4}% 13

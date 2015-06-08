@@ -18,7 +18,7 @@
 
 \textsc{\LARGE Sztuczna inteligencja - projekt.}\\[1.0cm]
 
-{ \huge \bfseries Wykrywanie i zliczanie wystąpień samochodów na zdjęciach ze skrzyżowań kamer miejskich za pomocą sieci neuronowej. \\[1.5cm] }
+{ \huge \bfseries Wykrywanie samochodów na zdjęciach przy pomocy sieci neuronowej. \\[1.5cm] }
 
 \noindent
 \begin{tabular}[c]{c c c c}
@@ -38,11 +38,12 @@
 \section{Wstęp}
 \subsection{Sformułowanie problemu}
 \subparagraph{} W dzisiejszych czasach analiza i klasyfikacja (np. pod względem natężenia) ruchu drogowego na skrzyżowaniach jest stosunkowo często poruszanym problemem, wiążącym się ze stałym rozwojem ośrodków miejskich i rosnącą liczbą uczestników ruchu miejskiego. Poprawne podejście do omawianego problemu pozwala na usprawnienie ruchu, a co za tym idzie redukcję zanieczyszczeń, zwiększenie bezpieczeństwa itp.
-\subparagraph{} W naszym problemie postanowiliśmy skoncentrować się przede wszystkim na liczeniu pojazdów na zdjęciach, jednak bardziej ogólne, a nawet zupełnie odmienne, podejścia również są możliwe; część z nich omówiona została bardziej szczegółowo w dalszej części pracy (np. klasyfikacja względem typu pojazdu).
+\subparagraph{} W naszym problemie postanowiliśmy skoncentrować się przede wszystkim na liczeniu pojazdów na zdjęciach, jednak bardziej ogólne, a nawet zupełnie odmienne, podejścia również są możliwe; o części z nich mowa będzie w dalszej części pracy.
 
 \subsection{Analiza problemu}
-\subparagraph{} Wybrany przez nas temat wiąże się z dużą liczbą problemów, które będzie trzeba rozwiązać w trakcie tworzenia projektu. Pierwszym z nich jest odpowiednie przetworzenie danych wejściowych – tutaj będzie trzeba zająć się oddzieleniem samochodów od otoczenia, żeby skupić się na obiektach, które nas interesują. Ponadto istotnym kłopotem jest nakładanie się pojazdów w związku z ich licznymi wystąpieniami na zdjęciach, jak i ich różne typy samochodów (osobowe, ciężarowe, z przyczepami itd.), co może negatywnie wpływać na podanie poprawnego wyniku. Problemem może być również kwestia perspektywy (przy metodzie sliding window), jak i oświetlenia szukanych przez nas środków transportu. Wiązać się to będzie z licznymi uproszczeniami w modelu wzorcowym tego projektu. Uproszczenia najprawdopodobniej będą się wiązać nie tylko z grafiką, ale i budową samej sieci neuronowej. Tutaj istotnym problemem będzie również dobranie odpowiedniej funkcji oceniającej (kryterium), dla wcześniej spreparowanych danych wejściowych, jak i przygotowanie odpowiednio dużego zbioru uczącego, aby można było zwrócić wiarygodne wyniki.
-\subparagraph{} Dokładna realizacja zadania  zależy od przyjętej metody i ewentualnych uproszczeń związanych z ww. problemami i nie może być jednoznacznie określona na tak wczesnym etapie projektu. Kwestie związane ze wstępnym przetwarzaniem obrazu najprawdopodobniej wiązać się będą z wykorzystaniem biblioteki OpenCV. Dane wejściowe przypuszczalnie będą również związane z dużymi uproszczeniami, jak np. mniejsze zagęszczenie drogi przy odpowiednim oświetleniu. Jeśli chodzi o samą budowę sieci neuronowej, istnieje biblioteka FANN (ang. Fast Artificial Neural Network), która również może nam pomóc przy pracy nad rozwiązaniem postawionych sobie problemów. Ponadto istotną pomocą będą istniejące już rozwiązania, które są opisane poniżej. 
+\subparagraph{} Wybrany przez nas temat wiąże się z dużą liczbą problemów, które będzie trzeba rozwiązać w trakcie tworzenia projektu. Pierwszym z nich jest odpowiednie przetworzenie danych wejściowych – tutaj będzie trzeba zająć się oddzieleniem samochodów od otoczenia, żeby skupić się na obiektach, które nas interesują. Ponadto istotnym kłopotem jest nakładanie się pojazdów w związku z ich licznymi wystąpieniami na zdjęciach, jak i ich różne typy samochodów (osobowe, ciężarowe, z przyczepami itd.), co może negatywnie wpływać na podanie poprawnego wyniku. Problemem może być również kwestia perspektywy (przy metodzie sliding window), jak i oświetlenia szukanych przez nas środków transportu. Wiązać się to będzie z licznymi uproszczeniami w modelu wzorcowym tego projektu. Uproszczenia najprawdopodobniej będą się wiązać nie tylko z grafiką, ale i budową samej sieci neuronowej. Tutaj istotnym problemem będzie również dobranie odpowiedniej funkcji oceniającej (kryterium), dla wcześniej spreparowanych danych wejściowych, jak i przygotowanie odpowiednio dużego zbioru uczącego, aby można było zwrócić wiarygodne wyniki. 
+
+\subparagraph{} Dokładna realizacja zadania  zależy od przyjętej metody i ewentualnych uproszczeń związanych z ww. problemami i nie może być jednoznacznie określona na tak wczesnym etapie projektu. Kwestie związane ze wstępnym przetwarzaniem obrazu najprawdopodobniej wiązać się będą z wykorzystaniem biblioteki OpenCV. Dane wejściowe przypuszczalnie będą również związane z dużymi uproszczeniami, jak np. mniejsze zagęszczenie drogi przy odpowiednim oświetleniu. Jeśli chodzi o samą budowę sieci neuronowej, istnieje biblioteka FANN (ang. Fast Artificial Neural Network), która również może nam pomóc przy pracy nad rozwiązaniem postawionych sobie problemów. Ponadto istotną pomocą będą istniejące już rozwiązania, które są opisane poniżej.  
  
 \subsection{Analiza istniejących rozwiązań}
 \begin{itemize}
@@ -60,26 +61,24 @@ Andrews Sobral, autor tej metody zajął się również śledzeniem samochodów 
 \section{Koncepcje rozwiązania problemu}
 
 \subsection{Rozwiązanie wstępne}
-\subparagraph{Omówienie} Wstępna realizacja projektu ma na celu zapoznanie się ze środowiskiem i wiąże ze sobą liczne uproszczenia. Na tym etapie projektu postaramy się zrozumieć działanie i zbudować fundamenty pod dalszą realizację projektu.
+\subparagraph{Omówienie} Wstępna koncepcja rozwiązania problemu zakładała znaczne uproszczenie danych wejściowych do wygenerowania czarnobiałych obrazków grupujących się w losowej ilości i miejscu przy zadanym rozmiarze obrazka. Sieć neuronowa miałaby w niej sprawdzać czy w danym miejscu występuje plama złożona z wielu połączonych ze sobą białych pikseli. Faza ta została jednak pominięta ze względu na dosyć zaawansowane prace przetwarzania zdjęć. Dzięki nim można było już testować sieć na gotowych przykładach zdjęć samochodów ze skrzyżowań na poszczególnych ulicach. Implementacja w dużym stopniu opierała się na niżej opisanych punktach.
 
-\subparagraph{Wstpępne założenia} Wyżej wspomniane uproszczenia oznaczają w dużym stopniu zmniejszenie wymagań odnośnie danych wejściowych do sieci neuronowej. Będą nimi obrazki złożone jedynie z dwóch kolorów pikseli - czarnych i białych. Dane uczące sieć neuronową nie będą zawierały wszystkich kombinacji pikseli, jednak będą zawierać określoną ilość obrazków z poprawnymi odpowiedziami. W przeciwnym wypadku sieć neuronowa znałaby wszystkie możliwe kombinacje i prawidłową odpowiedź na zadane dane wejściowe, gdyż zgodnie z założeniami odpowiedź algorytmu sieci neuronowej na danych testowych powinien zwracać 100\% poprawnych odpowiedzi. Najważniejszym założeniem do danych wejściowych na tym etapie jest to, że będą zliczane białe pola na czarnym tle.
+\subparagraph{Sieć neuronowa - bdowa i cele} Działanie sieci neuronowej polega na ocenie czy wytypowany wcześniej fragment obrazka należy zaklasyfikować jako samochód lub nie. Nauka sieci neuronowej polegała na nauce nadzorowanej. Aby zwracała ona odpowiednie wyniki trzeba było przygotować odpowiednią ilość danych, dzięki którym pary struktur wejściowych i wyjściowych byłyby prawidłowo skojarzone. Warto jednak zwrócić uwagę, że aby ocena ta była prawidłowa, dane wejściowe również muszą spełniać pewne kryteria(uproszczenia), takie jak np. nauka, jak i sprawdzanie obrazków wczytując je tylko w odcieniach szarości, brak nakładających się samochodów (aby odpowiednie je odseparować), lub aby dane wejściowe przesyłane do sieci neuronowej nie były jedynie uciętą częścią samochodu. Sieć, jej budowa, jak i problemy z nią związane są nieco szerzej opisane w późniejszej fazie sprawozdania.
 
-\subparagraph{Generowanie obrazów i danych wejściowych} Wcześniej wspomniane obrazki będą generowane losowo. Ich ilość jak i rozmiar są parametrami do ustalenia w kodzie generującym obrazki. Poprawna odpowiedź zostanie zapisana w nazwie pliku, a on sam będzie już interpretowany w postaci tabeli zawierającej kolory pikseli.
 
-\subparagraph{Sieć neuronowa - budowa i cele} Sieć neuronowa w tej fazie pracy będzie polegała na wykorzystaniu wcześniej wspomnianej biblioteki FANN. Jej cel to zliczanie białych pól, biorąc pod uwagę czy dane dwa białe piksele są ze sobą w dowolnym sąsiedztwie pikseli. Jeśli tak, to będą one zaliczane do jednej grupy.  Późniejsza rozbudowa sieci neuronowej jak i przetwarzania obrazów pozwoli na bardziej zaawansowane działania, co jest celem naszego projektu.
-
-\subparagraph{Przykłady}
+\subparagraph{Dane wejściowe i wynik działania} \hyperref[fig:przyklad_dzialania]{Rysunek \ref*{fig:przyklad_dzialania}} przedstawia oczekiwanie działanie systemu.
 \begin{figure}
 \begin{center}
-\includegraphics[scale=1]{przyklad.png}
+\begin{tabular}[c]{c c}
+\includegraphics[scale=0.4]{MWSnap055.jpg} &
+\includegraphics[scale=0.4]{11119220_994387450571628_742912767_n.jpg} \\
+\includegraphics[scale=0.4]{MWSnap053.jpg} &
+\includegraphics[scale=0.4]{11304256_994387423904964_745363915_n.jpg}
+\end{tabular}
 \end{center}
-\caption{przykładowe wejście prostej sieci neuronowej}
-\label{fig:przyklad_prostego_wejscia}
+\caption{Dane wejściowe i oczekiwany wynik działania sieci neuronowej}
+\label{fig:przyklad_dzialania}
 \end{figure}
-\hyperref[fig:przyklad_prostego_wejscia]{Rysunek \ref*{fig:przyklad_prostego_wejscia}} jest rozmiaru 50x50 pikseli i może być przykładem danych wejściowych do sieci neuronowej. Małe zagęszczenie białych pól ułatwia w tym wypadku ich zliczanie. Poprawną odpowiedzią do zadanego przykładu jest 95. 
-
-\subsection{Plan ew. rozbudowy projektu}
-\subparagraph{Omówienie} Po zaimplementowaniu i sprawdzeniu działania poprawności wcześniejszego etapu, spróbujemy nieco bardziej rozbudować projekt o niżej opisane punkty.
 
 \subparagraph{Przetwarzanie obrazu}
 \begin{enumerate}
@@ -87,17 +86,17 @@ Andrews Sobral, autor tej metody zajął się również śledzeniem samochodów 
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale=0.4]{przetwarzanie.png} 
+\includegraphics[scale=0.3]{przetwarzanie.png} 
 \end{center}
 \caption{przykładowy rezultat różnicy obrazów referencyjnego z analizowanym}
 \label{fig:absdiff}
 \end{figure}
 
-\subparagraph{} Aby znaleźć na takim obrazie konkretne elementy powinno się  usunąć z niego  konsekwencje naturalnych różnic między obrazem referencyjnym a tym na którym chcemy wykryć obiekty, takie jak zmieniające się światło i cień czy zmiany wynikające z podmuchu wiatru. Można skorzystać z funkcji \texttt{threshold}, dzięki której nie tylko pozbędziemy się tych niewielkich różnic ale także uzyskamy obraz na którym są tylko dwa możliwe kolory - czarny lub biały, dzięki czemu kolejne operacje będą łatwiejsze.  Problemem może być dobór odpowiedniej wartości jasności piksela, powyżej której jest on kwalifikowany jako biały, szczególnie, że  czasem samochody mogą mieć inne wartości różnicy w różnych miejscach, co powoduje, że cały samochód może się pojawić jako dwie grupy pikseli . Widać to na wyniku wspomnianej funkcji przedstawionym na \hyperref[fig:threshold]{Rysunku \ref*[fig:threshold]}. Pokazuje on ponadto, że rzeczywiście niewielkie różnice obrazów zostały wyeliminowane, chociaż nadal część z nich pozostało -- np. część wynikająca z przesuwającego się cienia.
+\subparagraph{} Aby znaleźć na takim obrazie konkretne elementy powinno się  usunąć z niego  konsekwencje naturalnych różnic między obrazem referencyjnym a tym na którym chcemy wykryć obiekty, takie jak zmieniające się światło i cień czy zmiany wynikające z podmuchu wiatru. Można skorzystać z funkcji \texttt{threshold}, dzięki której nie tylko pozbędziemy się tych niewielkich różnic ale także uzyskamy obraz na którym są tylko dwa możliwe kolory - czarny lub biały, dzięki czemu kolejne operacje będą łatwiejsze.\\ Problemem może być dobór odpowiedniej wartości jasności piksela, powyżej której jest on kwalifikowany jako biały, szczególnie, że  czasem samochody mogą mieć inne wartości różnicy w różnych miejscach, co powoduje, że cały samochód może się pojawić jako dwie grupy pikseli . Widać to na wyniku wspomnianej funkcji przedstawionym na \hyperref[fig:threshold]{Rysunku \ref*{fig:threshold}}. Pokazuje on ponadto, że rzeczywiście niewielkie różnice obrazów zostały wyeliminowane, chociaż nadal część z nich pozostało -- np. część wynikająca z przesuwającego się cienia.
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale=0.4]{przetwarzanie2.png} 
+\includegraphics[scale=0.3]{przetwarzanie2.png} 
 \end{center}
 \caption{\hyperref[fig:absdiff]{Rysunek \ref*{fig:absdiff}} po zastosowaniu funkcji \texttt{threshold}}
 \label{fig:threshold}
@@ -108,10 +107,13 @@ Andrews Sobral, autor tej metody zajął się również śledzeniem samochodów 
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale=0.4]{przetwarzanie3.png} 
+\includegraphics[scale=0.3]{przetwarzanie3.png} 
 \end{center}
-\caption{To jest background selector, czy schemat działania naszej metody?}
+\caption{Schemat przetwarzania obrazu do postaci czarno-białej}
 \end{figure}
+
+\subparagraph{} Oba sposoby pozwalają w dużym stopniu zredukować obraz z kamery skrzyżowania do problemu, który występował wcześniej. To z której z nich skorzystamy może zależeć od wielu czynników, np. od tego czy ktoś posiada obrazek referencyjny. 	
+\subparagraph{} Po przerobieniu obrazków to postaci grup białych pikseli na czarnym tle największym możliwym problemem będzie tu zakwalifikowanie tych grup jako jednego samochodu, jak i odróżnienie ich od innych białych punktów, jednak może nam w tym pomóc metoda omówiona poniżej.	
 
 
 \item Wykrywanie konturów
@@ -120,7 +122,7 @@ Andrews Sobral, autor tej metody zajął się również śledzeniem samochodów 
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[scale=0.4]{kontury.png} 
+\includegraphics[scale=0.3]{kontury.png} 
 \end{center}
 \caption{przykład wykrytych konturów}
 \label{fig:contours}
@@ -128,8 +130,7 @@ Andrews Sobral, autor tej metody zajął się również śledzeniem samochodów 
 
 \end{enumerate}
 
-\subparagraph{Rozbudowanie sieci neuronowej} Istnieje możliwość rozbudowania sieci neuronowej o inny typ – SOM ( Self-organising map), która pozwala na rozpoznawanie podobnych obrazków. Wynikiem działania sieci jest klasyfikacja przestrzeni w sposób grupujący zarówno przypadki ze zbioru uczącego, jak i wszystkie inne wprowadzenia po procesie uczenia.  Może to również usprawnić pracę działania programu.
-
+\newpage
 \section{Problemy implementacyjne}
 \subsection{Wybór języka programowania}
 \subparagraph{} Biorąc pod uwagę dostępność dedykowanych bibliotek oraz ogółem materiałów związanych z tematem naszej pracy, zdecydowaliśmy się na wybór języka C++ \footnote{natywny język OpenCV, FANN, natywny język dla API OpenCL-a}. Dostępność gotowych rozwiązań z jednej strony ułatwia implementację, z drugiej dodatkowo gwarantuje rozsądną szybkość działania, zagwarantowaną przez długotrwałe testowanie opragramowania, jak również sam wybór dosyć nieskopoziomowego języka, jakim jest C++. Dodatkowym argumentem przemawiającym za takim wyborem jest fakt, że każdy z uczestników projektu ma doświadczenie z tym językiem.
@@ -151,11 +152,42 @@ Andrews Sobral, autor tej metody zajął się również śledzeniem samochodów 
 \subparagraph{Wybór sieci neuronowej} Podstawową strukturą sieci neuronowej wykorzystywanej w naszym programie jest wielowartstwowy FFANN (ang. Feedforward Artifical Neural Network), pobierająca jako wejście ciąg pikseli podany w kolejności praw- lewo, góra-dół; każdy piksel reprezentowany jest jest przez 32-bitową liczbę w formacie RGBA (8 bitów na kanał).
 W czasie wyboru algorytmu uczącego interesowały nas wyniki różnych metod dla zagadnienia wykrywania schematów wśród danych wejściowych. Korzystając z zestawienia porównującego popularne algorytmy uczące \footnote{\scriptsize \url{http://www.mathworks.com/help/nnet/ug/choose-a-multilayer-neural-network-training-function.html}} wybór padł na metodę z rodziny resilient backpropagation. Mając na uwadze prędkość uczenia i prostotę implementacji ostatecznie wybraliśmy algorytm iRPROP+.
 
-\subparagraph{} Razem z wyborem funkcji uczącej, będącej pochodną metody backpropagation, pojawia się problem wyboru funkcji aktywującej dla pojedyńczych neuronów. Jak każdy algorytm tego typu, w celu uaktualnienia wag poszczególnych połączeń między neuronami w sieci, iPROP+ wymaga liczenia pochodnej funkcji błędu względem poszczególnej wagi, która z kolei wymaga znajomości pochodnej funkcji aktywacji. W celu uproszczenia obliczeń przyjęliśmy więc za nią funkcję logicznę postaci ...., której pochodna ma bardzo wdzięczną cechę .... Dzięki temu faktowi poprzednie równanie upraszcza się do dużo łatwiejszej do implementacji postaci:. 
+\subparagraph{} Razem z wyborem funkcji uczącej, będącej pochodną metody backpropagation, pojawia się problem wyboru funkcji aktywującej dla pojedyńczych neuronów. Jak każdy algorytm tego typu, w celu uaktualnienia wag poszczególnych połączeń między neuronami w sieci, iPROP+ wymaga liczenia pochodnej funkcji błędu względem poszczególnej wagi, która z kolei wymaga znajomości pochodnej funkcji aktywacji. W celu uproszczenia obliczeń przyjęliśmy więc za nią funkcję logicznę postaci \[ \varphi (z) = \frac{1}{1+e^{-z}} \] której pochodna ma bardzo wdzięczną postać: \[ \frac{\partial\varphi}{\partial z} = \varphi (1 - \varphi) \] Dzięki temu faktowi implementacja iRPROP+ znacznie się upraszcza. 
 
 \subparagraph{} Istotnym dla nas założeniem jest, aby implementacje wybranej metody umożliwiała dynamiczne dostowanie wielkości wiejścia i ilości warstw, dzięki czemu możliwe będzie stworzenie kilku niezależnych sieci, wykorzystwywanych dla wycinków analizowanej klatki o różnych rozmiarach. Zakładając, że fragment podejrzany o zawieranie samochodu ma wymiary 50x50, a my dysponujemy sieciami przyjmującymi 60x60 i 30x30, określenie całośćiowego prawdopodobieństwa dla podanego wejścia może być policzone jako ważona suma wyjść każdej sieci, gdzie wagą jest bliskość oryginalnego rozmiaru wejścia w stosunku do faktycznego wejścia danej sieci. Takie podejście upodabnia całość rozwiązania do opisanej na początku metody Multinet, gdzie na obliczenie ostatecznego rezultatu skłądały się wyniki wielu sieci.
 
 \subparagraph{Problem zrównoleglenia} Wybrany przez nas typ sieci ma tę zaletę, że dosyć łatwo daje się zrównoleglić. Korzystamy tutaj z faktu, że w czasie liczenia wyniku całej sieci, jeśli poprzednia warstwa zakończyła już liczenie wyjść swoich neuronów, dane będące na wejściu kolejnej są dobrze określone i nie podlegają zmianom w czasie liczenia wyjścia następnej warstwy. Jedyne konflikty w dostępnie do pamięci, w obrębie jednej wartwy, mogą mieć miejsce w chwili wyliczania $x$ dla funkcji aktywacji $i$-tego nauronu w danej wartstwie. Zakładając istnienie $m$ przychodzących połączeń, \[x_i = \sum _{j=0}^{m}w_{i,j}*in_j\]. Mamy więc $m$ konkurujących ze sobą wątków, chcących jednocześnie modyfikować tę samą zmienną $x_i$. Z pomocą przychodzą nam tutaj operaje atomowe, obsługiwane przez OpenCL. Ogólnie, przy zastosowaniu odpowiedniej liczby wątków, jesteśmy w stanie zrównoleglić działanie sieci typu Feedforward w taki sposób, aby każda operacja wymagała $O(n)$ kroków, gdzie $n$ jest liczbą warstw.
+
+\section{Aplikacja - wyniki i testowanie}
+\subsection{Przykładowe dane wejściowe i wyniki}
+\subparagraph{} Zdjęcia: \hyperref[fig:przyklad_1]{Rysunek \ref*{fig:przyklad_1}} i \hyperref[fig:przyklad_2]{Rysunek \ref*{fig:przyklad_2}}  przedstawiają przykładowe dane wejściowe (po lewej), jak i oznaczone przez nasz program miejsca, w których wykryty został samochód.
+
+
+\begin{figure}
+\begin{center}
+\begin{tabular}[c]{c c}
+\includegraphics[scale=0.4]{MWSnap055.jpg} &
+\includegraphics[scale=0.4]{11119220_994387450571628_742912767_n.jpg} \\
+\end{tabular}
+\end{center}
+\caption{Przykład 1}
+\label{fig:przyklad_1}
+\end{figure}
+\begin{figure}
+\begin{center}
+\begin{tabular}[c]{c c}
+\includegraphics[scale=0.4]{MWSnap053.jpg} &
+\includegraphics[scale=0.4]{11304256_994387423904964_745363915_n.jpg}
+\end{tabular}
+\end{center}
+\caption{Przykład 2}
+\label{fig:przyklad_2}
+\end{figure}
+
+\subparagraph{} Tak jak to widać na przykładach przedstawionych powyżej, sieć neuronowa w większości przypadków zwróciła poprawną odpowiedź w miejscach, które były typowane jako potencjalne wystąpienia samochodów. Udało się odróżnić inne obiekty (takie jak np. osoby przy przejściu dla pieszych), od rzeczywistych wystąpień aut.
+
+\subsection{Podsumowanie realizacji}
+\subparagraph{} Klasyfikacja jak i rozpoznawanie obrazów jest jednym z najcięższych wyzwań przy budowie sieci neuronowej. Nasz projekt miał na celu zapoznanie się z działaniem takich rozwiązań, przez co wzięte pod uwagę zostały liczne uproszczenia, bez których budowa, jak i poprawne działanie sieci byłoby zadaniem bardzo trudnym, prawdopodobnie wykraczającym poza materiał zarówno wykładów, jak i projektu, na którego zrobienie, znalezienie i zrozumienie działania rozwiązań poświęcony był czas jedynie jednego semestru. 
 
 
 \newpage

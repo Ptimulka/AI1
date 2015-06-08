@@ -9,25 +9,28 @@
 \contentsline {section}{\numberline {2}Koncepcje rozwiązania problemu}{4}{section.2}
 \contentsline {subsection}{\numberline {2.1}Rozwiązanie wstępne}{4}{subsection.2.1}
 \contentsline {subparagraph}{Omówienie}{4}{section*.6}
-\contentsline {subparagraph}{Wstpępne założenia}{4}{section*.7}
-\contentsline {subparagraph}{Generowanie obrazów i danych wejściowych}{4}{section*.8}
-\contentsline {subparagraph}{Sieć neuronowa - budowa i cele}{4}{section*.9}
-\contentsline {subparagraph}{Przykłady}{4}{figure.1}
-\contentsline {subsection}{\numberline {2.2}Plan ew. rozbudowy projektu}{5}{subsection.2.2}
-\contentsline {subparagraph}{Omówienie}{5}{section*.11}
-\contentsline {subparagraph}{Przetwarzanie obrazu}{5}{section*.12}
-\contentsline {subparagraph}{}{5}{section*.13}
-\contentsline {subparagraph}{}{7}{section*.14}
-\contentsline {subparagraph}{Rozbudowanie sieci neuronowej}{7}{section*.15}
+\contentsline {subparagraph}{Sieć neuronowa - bdowa i cele}{4}{section*.7}
+\contentsline {subparagraph}{Dane wejściowe i wynik działania}{4}{section*.8}
+\contentsline {subparagraph}{Przetwarzanie obrazu}{4}{section*.9}
+\contentsline {subparagraph}{}{5}{section*.10}
+\contentsline {subparagraph}{}{6}{section*.11}
+\contentsline {subparagraph}{}{6}{section*.12}
+\contentsline {subparagraph}{}{7}{section*.13}
 \contentsline {section}{\numberline {3}Problemy implementacyjne}{8}{section.3}
 \contentsline {subsection}{\numberline {3.1}Wybór języka programowania}{8}{subsection.3.1}
-\contentsline {subparagraph}{}{8}{section*.16}
+\contentsline {subparagraph}{}{8}{section*.14}
 \contentsline {subsection}{\numberline {3.2}Biblioteki}{8}{subsection.3.2}
+\contentsline {subparagraph}{}{8}{section*.15}
+\contentsline {subparagraph}{}{8}{section*.16}
 \contentsline {subparagraph}{}{8}{section*.17}
-\contentsline {subparagraph}{}{8}{section*.18}
-\contentsline {subparagraph}{}{8}{section*.19}
 \contentsline {subsection}{\numberline {3.3}Sieć neuronowa}{8}{subsection.3.3}
-\contentsline {subparagraph}{Wybór sieci neuronowej}{8}{section*.20}
-\contentsline {subparagraph}{}{9}{section*.21}
-\contentsline {subparagraph}{}{9}{section*.22}
-\contentsline {subparagraph}{Problem zrównoleglenia}{9}{section*.23}
+\contentsline {subparagraph}{Wybór sieci neuronowej}{8}{section*.18}
+\contentsline {subparagraph}{}{9}{section*.19}
+\contentsline {subparagraph}{}{9}{section*.20}
+\contentsline {subparagraph}{Problem zrównoleglenia}{9}{section*.21}
+\contentsline {section}{\numberline {4}Aplikacja - wyniki i testowanie}{10}{section.4}
+\contentsline {subsection}{\numberline {4.1}Przykładowe dane wejściowe i wyniki}{10}{subsection.4.1}
+\contentsline {subparagraph}{}{10}{section*.22}
+\contentsline {subparagraph}{}{10}{section*.23}
+\contentsline {subsection}{\numberline {4.2}Podsumowanie realizacji}{11}{subsection.4.2}
+\contentsline {subparagraph}{}{11}{section*.24}
