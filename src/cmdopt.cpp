@@ -17,12 +17,7 @@ namespace Opts
     optional<string> ann_file;
     optional<std::string> ocl_try_compile;
 
-	float ann_accept_threshold = 0.85f;
-	unsigned int iw = 50;
-	unsigned int ih = 20;
-	unsigned int nodes_in_hidden1 = 500;
-	unsigned int nodes_in_hidden2 = 0;
-	std::string imgs_learn = "fotyUczace";
+    float ann_accept_threshold = 0.85f;
 }
 
 
@@ -115,40 +110,4 @@ namespace
         "",
         0, 1,
         CMDLINE_ASSIGMENT_HANDLER(Opts::ann_accept_threshold));
-
-	static CmdOpt iw(
-		StringList({ "iw", "img-width" }),
-		"Specifies image width.\n"
-		"Default: 20",
-		0, 1,
-		CMDLINE_ASSIGMENT_HANDLER(Opts::iw));
-
-	static CmdOpt ih(
-		StringList({ "ih", "img-height" }),
-		"Specifies image height.\n"
-		"Default: 14",
-		0, 1,
-		CMDLINE_ASSIGMENT_HANDLER(Opts::ih));
-
-	static CmdOpt nodes_in_hidden1(
-		StringList({ "nodes_in_hidden1", "hidden1", "nodes1", "neurons1" }),
-		"Specifies number of neurons in 1 hidden layer.\n"
-		"Default: 2KB",
-		0, 1,
-		CMDLINE_ASSIGMENT_HANDLER(Opts::nodes_in_hidden1));
-
-	static CmdOpt nodes_in_hidden2(
-		StringList({ "nodes_in_hidden2", "hidden2", "nodes2", "neurons2" }),
-		"Specifies number of neurons in 2 hidden layer.\n"
-		"Default: 2KB",
-		0, 1,
-		CMDLINE_ASSIGMENT_HANDLER(Opts::nodes_in_hidden2));
-
-	static CmdOpt imgs_learn(
-		StringList({ "imgs_learn", "imgs" }),
-		"Specifies name of directory with images for learning.\n"
-		"Default: fotyUczace",
-		1, 1,
-		CMDLINE_ASSIGMENT_HANDLER(Opts::imgs_learn));
-
 }

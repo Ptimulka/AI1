@@ -60,13 +60,13 @@ int main(int argc, char** argv)
     
 
 
-	//uint iw = 50, ih = 20;	//image width, height
+	uint iw = 50, ih = 20;	//image width, height
 	const char *filename = "test50x20.ann";	//pod jak¹ nazw¹ zapisaæ nauczon¹ sieæ
 
 	///////------UCZENIE SIECIUNI!!!!---------\\\\\\\\	
 	if (Opts::ann_learn) {	
         //-ann-learning
-		ann_learn(Opts::iw, Opts::ih, filename, Opts::nodes_in_hidden1, Opts::nodes_in_hidden2);	//wysokosæ, szerokoœæ, nazwa pliku w którym zapisaæ sieæ, iloœæ neuronów w 1. warstwie ukrytej, potem 2. ukrytej - domyœlnie 0
+        ann_learn(iw, ih, filename, iw*ih / 2);	//wysokosæ, szerokoœæ, nazwa pliku w którym zapisaæ sieæ, iloœæ neuronów w 1. warstwie ukrytej, potem 2. ukrytej - domyœlnie 0
 		sLog.close();
 		return 0;
 	}
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 	////////   TUTAJ SPRAWDZANKO CZY NAUCZONA SIEC ZWRACA SPOKO WYNIKI DLA DANYCH UCZACYCH!!!
 	if (Opts::ann_tli) {
         //-ann-tli
-		ann_test_learning_images(Opts::iw, Opts::ih, filename, 0.85);
+		ann_test_learning_images(iw, ih, filename, 0.85);		
 		sLog.close();
 		return 0;
 	}
@@ -132,7 +132,7 @@ int main(int argc, char** argv)
 		}
 
 		//teraz czas na ann!!!
-		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(Opts::iw, Opts::ih);	//pobieramy obrazki ju¿ przystosowane na wejscie
+		std::vector<std::vector<Mat>> allRects = op.getMatsScaledTo(iw, ih);	//pobieramy obrazki ju¿ przystosowane na wejscie
 
 		for (decltype(allRects.size()) i = 0; i < allRects.size(); i++) {
 
