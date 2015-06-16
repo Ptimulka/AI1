@@ -72,7 +72,7 @@ void MainWindow::on_pushButton_3_clicked()
 }
 
 void MainWindow::runProgram() {
-	QString qs = "../../bin/vs120/x86/Release/AI1.exe";
+	QString qs = "AI1.exe";
 	QDir d(qs);
 	qs = d.absolutePath();
 	ui->logTextEdit->append("Ścieżka do programu:");
