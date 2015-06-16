@@ -17,4 +17,4 @@ using namespace std;
 
 void ann_learn(uint iw, uint ih, const char *filename, uint nodes_in_hidden1, uint nodes_in_hidden2 = 0);
 
-void ann_test_learning_images(uint iw, uint ih, const char *filename, float thresh);
+void ann_test_learning_images(uint iw, uint ih, const char *filename, float thresh, string imgsForLearning);

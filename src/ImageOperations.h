@@ -81,8 +81,8 @@ public:
 	//pobranie wszystkich prostokatow juz jako Maty (wycinki szarych obrazkow)
 	Mat getMatScaledTo(int obrazek, int podobrazek, int width, int height);
 
-    inline auto getImagesCount() const { return loadedImages.size(); }
-    inline auto getRectsCountForImage(int img) const { return vectorsOfRectsAll[img].size(); }
+    inline int getImagesCount() const { return loadedImages.size(); }
+    inline int getRectsCountForImage(int img) const { return vectorsOfRectsAll[img].size(); }
 
 	//zapamietanie ze j-ty prostokat i-tego obrazka jest samochodem
 	void setRectAsCar(uint image, uint rect);

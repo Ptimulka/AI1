@@ -20,7 +20,7 @@ void ann_learn(uint iw, uint ih, const char *filename, uint nodes_in_hidden1, ui
 
 	ann.init<ArtificialNeuralNetwork::FannDriver>(casesPerRun);
 
-	Dir imgs_dir(convert<string, wstring>("fotyUczace"));
+	Dir imgs_dir(convert<string, wstring>(Opts::imgs_learn));
 	std::vector<string> pathsPos;
 	std::vector<string> pathsNeg;
 
@@ -74,12 +74,11 @@ void ann_learn(uint iw, uint ih, const char *filename, uint nodes_in_hidden1, ui
 
 	ann.saveNative(filename);
 
-
 }
 
-void ann_test_learning_images(uint iw, uint ih, const char *filename, float thresh) {
+void ann_test_learning_images(uint iw, uint ih, const char *filename, float thresh, string imgsForLearning) {
 
-	Dir imgs_dir(convert<string, wstring>("fotyUczace"));
+	Dir imgs_dir(convert<string, wstring>(imgsForLearning));
 	std::vector<string> pathsPos;
 	std::vector<string> pathsNeg;
 

@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 	///////------UCZENIE SIECIUNI!!!!---------\\\\\\\\	
 	if (Opts::ann_learn) {	
         //-ann-learning
-        ann_learn(iw, ih, filename, iw*ih / 2);	//wysokosæ, szerokoœæ, nazwa pliku w którym zapisaæ sieæ, iloœæ neuronów w 1. warstwie ukrytej, potem 2. ukrytej - domyœlnie 0
+		ann_learn(Opts::iw, Opts::ih, filename, Opts::iw*Opts::ih / 2);	//wysokosæ, szerokoœæ, nazwa pliku w którym zapisaæ sieæ, iloœæ neuronów w 1. warstwie ukrytej, potem 2. ukrytej - domyœlnie 0
 		sLog.close();
 		return 0;
 	}
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 	////////   TUTAJ SPRAWDZANKO CZY NAUCZONA SIEC ZWRACA SPOKO WYNIKI DLA DANYCH UCZACYCH!!!
 	if (Opts::ann_tli) {
         //-ann-tli
-		ann_test_learning_images(iw, ih, filename, 0.85);		
+		ann_test_learning_images(Opts::iw, Opts::ih, filename, 0.85, Opts::imgs_learn);
 		sLog.close();
 		return 0;
 	}
@@ -176,7 +176,7 @@ int main(int argc, char** argv)
 		//zapisujemy obrazu z zielonymi zaznaczonymi do pliku
 		vector<UMat> mats2 = op.getLoadedImagesWithPossibleCars();
 		for (decltype(mats2.size()) i = 0; i < mats2.size(); i++) {
-			std::string gdzie = "./markedCarsAnn/obr" + std::to_string(groupNumber) + "_" + std::to_string(i) + ".jpg";
+			std::string gdzie = Opts::marked_cars_path + "/obr" + std::to_string(groupNumber) + "_" + std::to_string(i) + ".jpg";
 			imwrite(gdzie, mats2[i]);
 		}
 

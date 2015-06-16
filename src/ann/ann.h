@@ -59,8 +59,8 @@ public:
     void save(std::ostream& out) const;
 	void saveNative(std::string const& filename) const;
 
-    inline auto getInputWidth() const { return in_width; }
-    inline auto getInputHeight() const { return in_height; }
+    inline int getInputWidth() const { return in_width; }
+    inline int getInputHeight() const { return in_height; }
 
     inline void setInputSize(int w, int h) { in_width = w; in_height = h; }
 
